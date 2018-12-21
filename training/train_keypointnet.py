@@ -125,15 +125,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Training codes for Keras Pose Estimation')
     parser.add_argument('--backbone', default=None, help='backbone model name')
     parser.add_argument('--ambient', default='desktop', help='local training')
-    parser.add_argument('--weights', default='init')
+    parser.add_argument('--weights', default='imagenet')
     args = parser.parse_args()
 
 
     # restore weights
     #last_epoch = restore_weights(weights_best_file, model)
     #last_epoch = restore_weights("../model/squeeze_imagenet.h5", model)
-    if args.weights == 'init':
-        model = KeypointNet(18, 'resnet50', False, args.backbone).model
+    if args.weights == 'imagenet':
+        model = KeypointNet(18, args.backbone, False, args.weights).model
     else:
         model = KeypointNet(18, 'resnet50', False, None).model
         model.load_weights(args.weights)
