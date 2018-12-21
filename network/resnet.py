@@ -25,11 +25,12 @@ import os
 from keras_applications import get_submodules_from_kwargs
 from keras_applications.imagenet_utils import _obtain_input_shape
 
+from keras import backend
+from keras import layers
+from keras import models
+from keras import utils
 
-backend = None
-layers = None
-models = None
-keras_utils = None
+
 
 
 BASE_WEIGHTS_PATH = (
@@ -307,8 +308,6 @@ def ResNet(stack_fn,
         ValueError: in case of invalid argument for `weights`,
             or invalid input shape.
     """
-    global backend, layers, models, keras_utils
-    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
     if not (weights in {'imagenet', None} or os.path.exists(weights)):
         raise ValueError('The `weights` argument should be either '
