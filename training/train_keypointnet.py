@@ -1,6 +1,8 @@
 import math
 import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 import pandas
 from functools import partial
 import argparse
@@ -13,7 +15,6 @@ from network.keypoint_net import KeypointNet
 
 from dataflow.keypoint_datagen import get_dataflow, batch_dataflow, COCODataPaths
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 batch_size = 2
 base_lr = 4e-5 # 2e-5
