@@ -513,11 +513,11 @@ def ResNeXt50(include_top=True,
               classes=1000,
               **kwargs):
     def stack_fn(x):
-        x = stack3(x, 128, 3, stride1=1, name='conv2')
-        x = stack3(x, 256, 4, name='conv3')
-        x = stack3(x, 512, 6, name='conv4')
-        x = stack3(x, 1024, 3, name='conv5')
-        return x
+        C1 = stack3(x, 128, 3, stride1=1, name='conv2')
+        C2 = stack3(C1, 256, 4, name='conv3')
+        C3 = stack3(C2, 512, 6, name='conv4')
+        C4 = stack3(C3, 1024, 3, name='conv5')
+        return C1, C2, C3, C4
     return ResNet(stack_fn, False, False, 'resnext50',
                   include_top, weights,
                   input_tensor, input_shape,
@@ -533,11 +533,11 @@ def ResNeXt101(include_top=True,
                classes=1000,
                **kwargs):
     def stack_fn(x):
-        x = stack3(x, 128, 3, stride1=1, name='conv2')
-        x = stack3(x, 256, 4, name='conv3')
-        x = stack3(x, 512, 23, name='conv4')
-        x = stack3(x, 1024, 3, name='conv5')
-        return x
+        C1 = stack3(x, 128, 3, stride1=1, name='conv2')
+        C2 = stack3(C1, 256, 4, name='conv3')
+        C3 = stack3(C2, 512, 23, name='conv4')
+        C4 = stack3(C3, 1024, 3, name='conv5')
+        return C1, C2, C3, C4
     return ResNet(stack_fn, False, False, 'resnext101',
                   include_top, weights,
                   input_tensor, input_shape,

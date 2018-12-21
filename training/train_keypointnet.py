@@ -126,17 +126,21 @@ if __name__ == '__main__':
     parser.add_argument('--backbone', default=None, help='backbone model name')
     parser.add_argument('--ambient', default='desktop', help='local training')
     parser.add_argument('--weights', default='imagenet')
+    parser.add_argument('--checkpoint', default=None)
     args = parser.parse_args()
 
 
     # restore weights
     #last_epoch = restore_weights(weights_best_file, model)
     #last_epoch = restore_weights("../model/squeeze_imagenet.h5", model)
-    if args.weights == 'imagenet':
-        model = KeypointNet(18, args.backbone, False, args.weights).model
+
+    if args.checkpoint:
+        model = KeypointNet(18, args.backbone, False, None).model
+        model.load_weights(args.checkpoint)
+
     else:
-        model = KeypointNet(18, 'resnet50', False, None).model
-        model.load_weights(args.weights)
+        model = KeypointNet(18, args.backbone, False, args.weights).model
+
     print(model.summary())
 
     # prepare generators
@@ -209,6 +213,6 @@ if __name__ == '__main__':
                         epochs=max_iter,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
-                        validation_steps=val_samples // batch_size,
+                        validation_steps=10,
                         use_multiprocessing=False,
                         initial_epoch=0)
