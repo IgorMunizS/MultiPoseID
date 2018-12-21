@@ -12,9 +12,9 @@ class KeypointNet():
         else:
             input_image = (480,480,3)
         #input_heat_mask = KL.Input(shape=(120,120,19))
-        backbone = Backbone(input_image, bck_arch).model
-        if bck_weights == 'imagenet':
-            backbone.load_weights('/home/igor/PycharmProjects/MultiPoseIdentification/Models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5')
+        backbone = Backbone(input_image, bck_arch, bck_weights).model
+        # if bck_weights == 'imagenet':
+        #     backbone.load_weights('/home/igor/PycharmProjects/MultiPoseIdentification/Models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5')
         input_graph = backbone.input
         C2,C3,C4,C5 = backbone.output
         self.fpn_part(C2,C3,C4,C5)
