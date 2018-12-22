@@ -214,6 +214,6 @@ if __name__ == '__main__':
                         epochs=max_iter // steps_per_epoch,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
-                        validation_steps=10,
+                        validation_steps=100,
                         use_multiprocessing=False,
                         initial_epoch=0)
