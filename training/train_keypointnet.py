@@ -16,7 +16,7 @@ from network.keypoint_net import KeypointNet
 from dataflow.keypoint_datagen import get_dataflow, batch_dataflow, COCODataPaths
 
 
-batch_size = 16
+batch_size = 4
 base_lr = 4e-5 # 2e-5
 momentum = 0.9
 weight_decay = 5e-4
