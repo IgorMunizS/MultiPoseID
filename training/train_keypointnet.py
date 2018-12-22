@@ -23,7 +23,8 @@ weight_decay = 5e-4
 lr_policy =  "step"
 gamma = 0.333
 stepsize = 136106 #68053   // after each stepsize iterations update learning rate: lr=lr*gamma
-max_iter = 200000 # 600000
+max_iter = 50000 # 600000
+steps_per_epoch = 1000
 
 weights_best_file = "weights.best.h5"
 training_log = "training.csv"
@@ -209,8 +210,8 @@ if __name__ == '__main__':
     loss_funcs = get_loss_funcs()
     model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
-                        steps_per_epoch=5000,
-                        epochs=max_iter,
+                        steps_per_epoch=steps_per_epoch,
+                        epochs=max_iter // steps_per_epoch,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
                         validation_steps=10,
