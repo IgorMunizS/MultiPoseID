@@ -23,7 +23,7 @@ weight_decay = 5e-4
 lr_policy =  "step"
 gamma = 0.333
 stepsize = 136106 #68053   // after each stepsize iterations update learning rate: lr=lr*gamma
-max_iter = 30000 # 600000
+max_iter = 600000 # 600000
 steps_per_epoch = 3000
 
 weights_best_file = "weights.best.h5"
@@ -225,6 +225,6 @@ if __name__ == '__main__':
                         epochs=max_iter // steps_per_epoch,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
-                        validation_steps=100,
+                        validation_steps=val_samples // batch_size,
                         use_multiprocessing=False,
                         initial_epoch=0)
