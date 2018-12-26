@@ -128,8 +128,11 @@ if __name__ == '__main__':
     parser.add_argument('--ambient', default='desktop', help='local training')
     parser.add_argument('--weights', default='imagenet')
     parser.add_argument('--checkpoint', default=None)
+    parser.add_argument('--batchsize', default=4)
     args = parser.parse_args()
 
+
+    batch_size = int(args.batchsize)
 
     # restore weights
     #last_epoch = restore_weights(weights_best_file, model)
