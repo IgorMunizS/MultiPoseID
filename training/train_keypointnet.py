@@ -218,11 +218,12 @@ if __name__ == '__main__':
     opt = Adam(lr=1e-4)
     # start training
     steps_per_epoch = train_samples // batch_size
+    print(steps_per_epoch)
     loss_funcs = get_loss_funcs()
     model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
                         steps_per_epoch=steps_per_epoch,
-                        epochs=max_iter // steps_per_epoch,
+                        epochs=30,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
                         validation_steps=val_samples // batch_size,
