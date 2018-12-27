@@ -176,7 +176,7 @@ if __name__ == '__main__':
     train_samples = df.size()
 
     df_val = get_dataflow([coco_data_val])
-    val_samples = df.size()
+    val_samples = df_val.size()
 
     # get generator of batches
 
@@ -222,6 +222,7 @@ if __name__ == '__main__':
     # start training
     steps_per_epoch = train_samples // batch_size
     print(steps_per_epoch)
+    print(val_samples // batch_size)
     loss_funcs = get_loss_funcs()
     model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
