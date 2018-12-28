@@ -23,7 +23,7 @@ weight_decay = 5e-4
 lr_policy =  "step"
 gamma = 0.333
 stepsize = 136106 #68053   // after each stepsize iterations update learning rate: lr=lr*gamma
-max_iter = 600000 # 600000
+max_iter = 60000 # 600000
 steps_per_epoch = 3000
 
 weights_best_file = "weights.best.h5"
@@ -196,9 +196,9 @@ if __name__ == '__main__':
     _step_decay = partial(step_decay,
                           iterations_per_epoch=iterations_per_epoch
                           )
-    # lrate = LearningRateScheduler(_step_decay)
+    lrate = LearningRateScheduler(_step_decay)
 
-    lrate = ReduceLROnPlateau(
+    reducelr = ReduceLROnPlateau(
         monitor='loss',
         factor=0.3,
         patience=2,
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         mode='auto',
         epsilon=0.0001,
         cooldown=0,
-        min_lr=0
+        min_lr=1e-9
     )
     checkpoint = ModelCheckpoint("model.{epoch:02d}-{loss:.2f}.hdf5", monitor='loss',
                                  verbose=0, save_best_only=False,
@@ -215,12 +215,12 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [lrate, checkpoint, csv_logger, tb]
+    callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
 
 
     opt = Adam(lr=1e-4)
     # start training
-    steps_per_epoch = train_samples // batch_size
+    steps_per_epoch = 5000
     print(steps_per_epoch)
     print(val_samples // batch_size)
     loss_funcs = get_loss_funcs()
