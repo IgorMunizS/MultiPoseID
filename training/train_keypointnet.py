@@ -220,7 +220,7 @@ if __name__ == '__main__':
 
     opt = Adam(lr=1e-4)
     # start training
-    steps_per_epoch = 5000
+    # steps_per_epoch = 5000
     print(steps_per_epoch)
     print(val_samples // batch_size)
     loss_funcs = get_loss_funcs()
