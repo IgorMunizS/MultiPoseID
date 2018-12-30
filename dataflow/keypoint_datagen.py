@@ -166,7 +166,7 @@ def build_sample(components):
     heatmap = create_heatmap(JointsLoader.num_joints_and_bkg, 120, 120,
                              meta.aug_joints, 7.0, stride=4)
 
-    image = preprocess_image(image)
+    # image = preprocess_image(image)
     # release reference to the image/mask/augmented data. Otherwise it would easily consume all memory at some point
     meta.mask = None
     meta.img = None
