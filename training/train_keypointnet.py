@@ -208,7 +208,7 @@ if __name__ == '__main__':
         cooldown=0,
         min_lr=1e-9
     )
-    checkpoint = ModelCheckpoint("model.{epoch:02d}-{loss:.2f}.hdf5", monitor='loss',
+    checkpoint = ModelCheckpoint("model.{epoch:02d}-{val_loss:.2f}.hdf5", monitor='val_loss',
                                  verbose=0, save_best_only=False,
                                  save_weights_only=True, mode='min', period=1)
     csv_logger = CSVLogger(training_log, append=True)
