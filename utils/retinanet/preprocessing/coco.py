@@ -38,7 +38,7 @@ class CocoGenerator(Generator):
         """
         self.data_dir  = data_dir
         self.set_name  = set_name
-        self.coco      = COCO(os.path.join(data_dir, 'instances_' + set_name + '.json'))
+        self.coco      = COCO(os.path.join(data_dir, 'annotations', 'instances_' + set_name + '.json'))
         catIds = self.coco.getCatIds(catNms=['person'])
         self.image_ids = self.coco.getImgIds(catIds=catIds)
         print("Numero de imagens: ", len(self.image_ids))
