@@ -47,12 +47,6 @@ def backbone(backbone_name):
     """
     if 'resnet' in backbone_name:
         from .resnet import ResNetBackbone as b
-    elif 'mobilenet' in backbone_name:
-        from .mobilenet import MobileNetBackbone as b
-    elif 'vgg' in backbone_name:
-        from .vgg import VGGBackbone as b
-    elif 'densenet' in backbone_name:
-        from .densenet import DenseNetBackbone as b
     else:
         raise NotImplementedError('Backbone class for  \'{}\' not implemented.'.format(backbone))
 
@@ -83,7 +77,7 @@ def load_model(filepath, backbone_name='resnet50', convert=False, nms=True, clas
 
     model = keras.models.load_model(filepath, custom_objects=backbone(backbone_name).custom_objects)
     if convert:
-        from .retinanet import retinanet_bbox
+        from network.retinanet import retinanet_bbox
         model = retinanet_bbox(model=model, nms=nms, class_specific_filter=class_specific_filter, anchor_params=anchor_params)
 
     return model
