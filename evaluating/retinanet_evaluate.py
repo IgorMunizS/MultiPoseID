@@ -129,7 +129,7 @@ def main(args=None):
 
     # start evaluation
     if args.dataset_type == 'coco':
-        from ..utils.coco_eval import evaluate_coco
+        from  utils.retinanet.utils.coco_eval import evaluate_coco
         evaluate_coco(generator, model, args.score_threshold)
     else:
         average_precisions = evaluate(
