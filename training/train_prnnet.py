@@ -75,8 +75,8 @@ def main(option):
 
 if __name__ == "__main__":
     option = Options().parse()
-    # coco_train = COCO(os.path.join('data/annotations/person_keypoints_train2017.json'))
-    # coco_val = COCO(os.path.join('data/annotations/person_keypoints_val2017.json'))
-    coco_train = COCO(os.path.join('/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_train2017.json'))
-    coco_val = COCO(os.path.join('/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json'))
+    coco_train = COCO(os.path.join('data/annotations/person_keypoints_train2017.json'))
+    coco_val = COCO(os.path.join('data/annotations/person_keypoints_val2017.json'))
+    # coco_train = COCO(os.path.join('/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_train2017.json'))
+    # coco_val = COCO(os.path.join('/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json'))
     main(option)
