@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 import keras
 from pycocotools.coco import  COCO
 from network.prn_network import PRN, PRN_Seperate
