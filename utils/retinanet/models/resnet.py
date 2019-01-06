@@ -15,11 +15,9 @@ import keras
 from keras.utils import get_file
 
 from network import resnet as resnets
-import keras_resnet
 
 from network import retinanet
 from . import Backbone
-from utils.preprocessing_image import preprocess_image
 
 
 class ResNetBackbone(Backbone):
