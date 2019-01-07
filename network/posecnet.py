@@ -52,17 +52,16 @@ class PoseCNet():
 
         self.concat = KL.concatenate([self.D2, self.D3, self.D4, self.D5], axis=-1)
         self.D = KL.Conv2D(512, (3, 3), activation="relu", padding="SAME", name="Dfinal_1")(self.concat)
-        self.D = KL.Conv2D(self.nb_keypoints, (1, 1), padding="SAME", name="Dfinal_2")(self.D)
+        self.keypoint_output = KL.Conv2D(self.nb_keypoints, (1, 1), padding="SAME", name="Dfinal_2")(self.D)
 
 
         #DetectionNet part (RetinaNet)
 
         retina_net = retinanet(self.backbone.model.input, [C3, C4, C5], 1)
         retina_bbox = retinanet_bbox(retina_net)
-        detection = retina_bbox.output
-        print(detection)
-        output = [self.D]
-        output.extend(detection)
+        self.detection_output = retina_bbox.output
+        output = [self.keypoint_output]
+        output.extend(self.detection_output)
         self.model = Model(inputs=self.backbone.model.input, outputs=output)
         print(self.model.summary())
 

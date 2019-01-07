@@ -56,8 +56,6 @@ def Evaluation(model,optin,coco):
             if i == 16:
                 ks.append(neck)
 
-        print(ks)
-
 
 
         image_id = anns[0]['image_id']
@@ -84,7 +82,7 @@ def Evaluation(model,optin,coco):
         if (sum(1 for i in p['peaks'] if i != []) >= 0):
             temporary_peak_res.append(p)
     peak_results = temporary_peak_res
-    print(peak_results)
+
     for p in tqdm(peak_results):
         idx = p['image_id']
         image_ids.append(idx)
