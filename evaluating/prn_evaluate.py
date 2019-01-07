@@ -15,7 +15,7 @@ def Evaluation(model,optin,coco):
     n_kernel = optin.window_size
     modelname = 'temporary'
 
-    cocodir = '/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json'
+    cocodir = 'data/annotations/person_keypoints_val2017.json'
     ann = json.load(open(cocodir))
     bbox_results = ann['annotations']
 
