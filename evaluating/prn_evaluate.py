@@ -15,7 +15,7 @@ def Evaluation(model,optin,coco):
     n_kernel = optin.window_size
     modelname = 'temporary'
 
-    cocodir = 'data/annotations/person_keypoints_val2017.json'
+    cocodir = '/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json'
     ann = json.load(open(cocodir))
     bbox_results = ann['annotations']
 
@@ -30,17 +30,36 @@ def Evaluation(model,optin,coco):
         idx = 0
 
         ks = []
+
+        #add neck keypoint to model inference
         for i in range(17):
             t = []
+            neck = []
             for k in kps:
                 x = k[0::3][i]
                 y = k[1::3][i]
                 v = k[2::3][i]
 
                 if v > 0:
-                    t.append([x, y, 1, idx])
-                    idx += 1
+                    if i == 16:
+                        neck_x = (k[0::3][5] + k[0::3][6]) / 2
+                        neck_y = (k[1::3][5] + k[1::3][6]) / 2
+                        t.append([x, y, 1, idx])
+                        neck.append([neck_x,neck_y,1,17])
+                        idx += 1
+
+                    else:
+                        t.append([x, y, 1, idx])
+                        idx += 1
+
             ks.append(t)
+            if i == 16:
+                ks.append(neck)
+
+        print(ks)
+
+
+
         image_id = anns[0]['image_id']
         peaks = ks
 
@@ -65,7 +84,7 @@ def Evaluation(model,optin,coco):
         if (sum(1 for i in p['peaks'] if i != []) >= 0):
             temporary_peak_res.append(p)
     peak_results = temporary_peak_res
-
+    print(peak_results)
     for p in tqdm(peak_results):
         idx = p['image_id']
         image_ids.append(idx)
@@ -77,7 +96,7 @@ def Evaluation(model,optin,coco):
         if len(bboxes) == 0 or len(peaks) == 0:
             continue
 
-        weights_bbox = np.zeros((len(bboxes), h, w, 4, 17))
+        weights_bbox = np.zeros((len(bboxes), h, w, 4, 18))
 
         for joint_id, peak in enumerate(peaks):
 
@@ -123,7 +142,7 @@ def Evaluation(model,optin,coco):
         old_weights_bbox = np.copy(weights_bbox)
 
         for j in range(weights_bbox.shape[0]):
-            for t in range(17):
+            for t in range(18):
                 weights_bbox[j, :, :, 0, t] = gaussian(weights_bbox[j, :, :, 0, t])
             # weights_bbox[j, :, :, 0, :]      = gaussian_multi_input_mp(weights_bbox[j, :, :, 0, :])
 
@@ -137,6 +156,7 @@ def Evaluation(model,optin,coco):
 
         keypoints_score = []
 
+        #coco eval doesn't have neck keypoint, from here we only use 17
         for t in range(17):
             indexes = np.argwhere(old_weights_bbox[:, :, :, 0, t] == 1)
             keypoint = []
@@ -236,7 +256,7 @@ def Evaluation(model,optin,coco):
             my_results.append(image_data)
 
 
-    ann_filename = 'data/val2017_PRN_keypoint_results_{}.json'.format(modelname)
+    ann_filename = 'val2017_PRN_keypoint_results_{}.json'.format(modelname)
     # write output
     json.dump(my_results, open(ann_filename, 'w'), indent=4)
 
