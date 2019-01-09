@@ -15,7 +15,7 @@ def Evaluation(model,optin,coco):
     n_kernel = optin.window_size
     modelname = 'temporary'
 
-    cocodir = 'data/annotations/person_keypoints_val2017.json'
+    cocodir = '/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json'
     ann = json.load(open(cocodir))
     bbox_results = ann['annotations']
 
@@ -23,38 +23,41 @@ def Evaluation(model,optin,coco):
 
     peak_results = []
 
+    idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
+
     for i in img_ids:
         anns = coco.loadAnns(coco.getAnnIds(imgIds=i))
         kps = [a['keypoints'] for a in anns]
+
 
         idx = 0
 
         ks = []
 
         #add neck keypoint to model inference
-        for i in range(17):
+        for i in range(18):
             t = []
-            neck = []
-            for k in kps:
-                x = k[0::3][i]
-                y = k[1::3][i]
-                v = k[2::3][i]
+            if i != 17:
+                for k in kps:
+                    x = k[0::3][i]
+                    y = k[1::3][i]
+                    v = k[2::3][i]
 
-                if v > 0:
-                    if i == 16:
-                        neck_x = (k[0::3][5] + k[0::3][6]) / 2
-                        neck_y = (k[1::3][5] + k[1::3][6]) / 2
+                    if v > 0:
                         t.append([x, y, 1, idx])
-                        neck.append([neck_x,neck_y,1,17])
                         idx += 1
 
-                    else:
-                        t.append([x, y, 1, idx])
+            else:
+                for k in kps:
+                    neck_x = (k[0::3][5] + k[0::3][6]) / 2
+                    neck_y = (k[1::3][5] + k[1::3][6]) / 2
+                    neck_v = min(k[2::3][5], k[2::3][6])
+
+                    if neck_v > 0:
+                        t.append([neck_x, neck_y, 1, idx])
                         idx += 1
 
             ks.append(t)
-            if i == 16:
-                ks.append(neck)
 
 
 
@@ -147,8 +150,11 @@ def Evaluation(model,optin,coco):
         output_bbox = []
         for j in range(weights_bbox.shape[0]):
             inp = weights_bbox[j, :, :, 0, :]
-            output = model.predict(np.expand_dims(inp, axis=0))
-            output_bbox.append(output[0])
+            inp_idx_coco = inp[...,idx_in_coco]
+            output = model.predict(np.expand_dims(inp_idx_coco, axis=0))
+            output_coco = np.copy(output[0])
+            output_coco = output_coco[...,[idx_in_coco.index(i) for i in range(18)]]
+            output_bbox.append(output_coco)
 
         output_bbox = np.array(output_bbox)
 
