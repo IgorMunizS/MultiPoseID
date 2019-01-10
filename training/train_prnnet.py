@@ -62,10 +62,10 @@ def main(option):
 
     model = PRN_Seperate(option.coeff*28,option.coeff*18, option.node_count)
 
-    adam_optimizer = keras.optimizers.Adam(lr=option.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0001)
+    adam_optimizer = keras.optimizers.Adam(lr=option.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000001)
     model.compile(loss='binary_crossentropy', optimizer=adam_optimizer)
     Own_callback = My_Callback()
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,patience=2)
+    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5,patience=3)
 
     model.fit_generator(generator=train_bbox_generator(coco_train, option.batch_size, option.coeff*28,option.coeff*18,option.threshold),
                         steps_per_epoch=len(get_anns(coco_train)) // option.batch_size,
