@@ -8,6 +8,7 @@ from network.prn_network import PRN, PRN_Seperate
 from dataflow.prn_data_generator import train_bbox_generator, val_bbox_generator
 from dataflow.prn_data_generator  import get_anns
 from evaluating.prn_evaluate import Evaluation
+from keras.callbacks import ReduceLROnPlateau
 
 import argparse
 from pprint import pprint
@@ -22,7 +23,7 @@ class Options:
 
         # --------------------------  General Training Options
         self.parser.add_argument('--lr', type=float, default=0.0001, help='Learning Rate')
-        self.parser.add_argument('--number_of_epoch', type=int, default=16, help='Epoch')
+        self.parser.add_argument('--number_of_epoch', type=int, default=20, help='Epoch')
         self.parser.add_argument('--batch_size', type=int, default=8, help='Batch Size')
         self.parser.add_argument('--node_count', type=int, default=1024, help='Hidden Layer Node Count')
         # --------------------------  General Training Options
@@ -61,17 +62,17 @@ def main(option):
 
     model = PRN_Seperate(option.coeff*28,option.coeff*18, option.node_count)
 
-    adam_optimizer = keras.optimizers.Adam(lr=option.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    adam_optimizer = keras.optimizers.Adam(lr=option.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0001)
     model.compile(loss='binary_crossentropy', optimizer=adam_optimizer)
     Own_callback = My_Callback()
-
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,patience=2)
 
     model.fit_generator(generator=train_bbox_generator(coco_train, option.batch_size, option.coeff*28,option.coeff*18,option.threshold),
                         steps_per_epoch=len(get_anns(coco_train)) // option.batch_size,
                         validation_data=val_bbox_generator(coco_val, option.batch_size,option.coeff*28,option.coeff*18, option.threshold),
                         validation_steps=len(coco_val.getAnnIds()) // option.batch_size,
                         epochs=option.number_of_epoch,
-                        callbacks=[Own_callback],
+                        callbacks=[Own_callback, reduce_lr],
                         verbose=1,
                         initial_epoch=0)
 
