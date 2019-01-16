@@ -19,24 +19,24 @@ def PRN(height, width, node_count):
 
 def PRN_Seperate(height, width, node_count):
     input = Input(shape=(height, width, 18))
-    y = Flatten()(input)
-    x = Dense(node_count, activation='relu')(y)
+    y = Flatten(name="prn_flatten")(input)
+    x = Dense(node_count, activation='relu', name="prn_dense_1")(y)
     x = Dropout(0.5)(x)
-    x = Dense(width * height * 18, activation='relu')(x)
-    x = keras.layers.Add()([x, y])
+    x = Dense(width * height * 18, activation='relu', name="prn_dense_2")(x)
+    x = keras.layers.Add(name="prn_dense1_add_dense2")([x, y])
     out = []
     start = 0
     end = width * height
 
     for i in range(18):
-        o = keras.layers.Lambda(lambda x: x[:, start:end])(x)
-        o = Activation('softmax')(o)
+        o = keras.layers.Lambda(lambda x: x[:, start:end], name="prn_lambda_" + str(i))(x)
+        o = Activation('softmax', name="prn_activation_" + str(i))(o)
         out.append(o)
         start = end
         end = start + width * height
 
-    x = keras.layers.Concatenate()(out)
-    x = Reshape((height, width, 18))(x)
+    x = keras.layers.Concatenate(name="prn_concat")(out)
+    x = Reshape((height, width, 18), name="prn_reshape")(x)
     model = Model(inputs=input, outputs=x)
     print(model.summary())
     return model
