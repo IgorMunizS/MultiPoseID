@@ -130,6 +130,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint', default=None)
     parser.add_argument('--batchsize', default=4, type=int)
     parser.add_argument('--epochs', default=30, type=int)
+    parser.add_argument('--steps', default=3000, type=int)
     parser.add_argument('--multiprocessing', default=False, type=bool)
     parser.add_argument('--workers', default=1, type=bool)
 
@@ -225,12 +226,12 @@ if __name__ == '__main__':
     opt = Adam(lr=1e-4)
     # start training
     # steps_per_epoch = 5000
-    print(steps_per_epoch)
+    print(args.steps)
     print(val_samples // batch_size)
     loss_funcs = get_loss_funcs()
     model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
-                        steps_per_epoch=steps_per_epoch,
+                        steps_per_epoch=args.steps,
                         epochs=args.epochs,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
