@@ -128,7 +128,10 @@ if __name__ == '__main__':
     parser.add_argument('--ambient', default='desktop', help='local training')
     parser.add_argument('--weights', default='imagenet')
     parser.add_argument('--checkpoint', default=None)
-    parser.add_argument('--batchsize', default=4)
+    parser.add_argument('--batchsize', default=4, type=int)
+    parser.add_argument('--multiprocessing', default=False, type=bool)
+    parser.add_argument('--workers', default=1, type=bool)
+
     args = parser.parse_args()
 
 
@@ -231,5 +234,6 @@ if __name__ == '__main__':
                         callbacks=callbacks_list,
                         validation_data=val_gen,
                         validation_steps=val_samples // batch_size,
-                        use_multiprocessing=False,
+                        use_multiprocessing=args.multiprocessing,
+                        workers = args.workers,
                         initial_epoch=0)
