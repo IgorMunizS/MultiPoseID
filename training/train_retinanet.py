@@ -347,6 +347,8 @@ def parse_args(args):
     parser.add_argument('--weighted-average', help='Compute the mAP using the weighted average of precisions among classes.', action='store_true')
     parser.add_argument('--optimizer',        help='Choose optimizer', default='adam', type=str)
     parser.add_argument('--lr',               help='Choose learning rate', default=1e-5, type=float)
+    parser.add_argument('--multiprocessing', default=False, type=bool)
+    parser.add_argument('--workers', default=1, type=bool)
     return check_args(parser.parse_args(args))
 
 
@@ -429,6 +431,8 @@ def main(args=None):
         epochs=args.epochs,
         verbose=1,
         callbacks=callbacks,
+        use_multiprocessing=args.multiprocessing,
+        workers=args.workers
     )
 
 
