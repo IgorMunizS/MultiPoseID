@@ -129,6 +129,7 @@ if __name__ == '__main__':
     parser.add_argument('--weights', default='imagenet')
     parser.add_argument('--checkpoint', default=None)
     parser.add_argument('--batchsize', default=4, type=int)
+    parser.add_argument('--epochs', default=30, type=int)
     parser.add_argument('--multiprocessing', default=False, type=bool)
     parser.add_argument('--workers', default=1, type=bool)
 
@@ -230,7 +231,7 @@ if __name__ == '__main__':
     model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
                         steps_per_epoch=steps_per_epoch,
-                        epochs=30,
+                        epochs=args.epochs,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
                         validation_steps=val_samples // batch_size,
