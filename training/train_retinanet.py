@@ -348,7 +348,7 @@ def parse_args(args):
     parser.add_argument('--optimizer',        help='Choose optimizer', default='adam', type=str)
     parser.add_argument('--lr',               help='Choose learning rate', default=1e-5, type=float)
     parser.add_argument('--multiprocessing', default=False, type=bool)
-    parser.add_argument('--workers', default=1, type=bool)
+    parser.add_argument('--workers', default=1, type=int)
     return check_args(parser.parse_args(args))
 
 
