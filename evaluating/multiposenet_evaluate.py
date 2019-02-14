@@ -33,7 +33,7 @@ def coco_eval(coco_dir, backbone="resnet50", filename_result="ann_coco_result.js
     multipose_results = []
     coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
-    for img_id in img_ids:
+    for img_id in tqdm(img_ids):
 
         img_name = coco.loadImgs(img_id)[0]['file_name']
 
