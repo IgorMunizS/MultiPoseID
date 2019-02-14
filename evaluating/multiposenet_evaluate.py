@@ -127,7 +127,8 @@ def get_outputs(multiplier, img, model):
 
 
         heatmaps, boxes, scores, labels, crops = model.predict(im_data)
-
+        boxes = boxes[0]
+        scores = scores[0]
 
         heatmap = heatmaps[0, :int(im_cropped.shape[0] / 4), :int(im_cropped.shape[1] / 4), :18]
         heatmap = cv2.resize(heatmap, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
