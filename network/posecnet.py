@@ -103,7 +103,7 @@ class PoseCNet():
         self.model = Model(inputs=self.backbone.model.input, outputs=output)
         print(self.model.summary())
 
-    def load_subnet_weights(self, k_weights, d_weights, p_weights):
+    def load_subnet_weights(self, k_weights, d_weights):
         self.model.load_weights(k_weights, by_name=True)
         self.model.load_weights(d_weights, by_name=True)
         #self.model.load_weights(p_weights, by_name=True)
