@@ -27,13 +27,13 @@ def coco_eval(coco_dir, backbone="resnet50", filename_result="ann_coco_result.js
 
     posecnet = PoseCNet(bck_arch=backbone)
     posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
-                                 d_weights="../Models/inference_detection_resnet50_0.421.h5",
-                                 p_weights="../Models/prn_epoch20_final.h5")
+                                 d_weights="../Models/inference_detection_resnet50_0.421.h5")
+                                 #p_weights="../Models/prn_epoch20_final.h5"
 
     multipose_results = []
     coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
-    for img_id in tqdm(img_ids[:10]):
+    for img_id in tqdm(img_ids):
 
         img_name = coco.loadImgs(img_id)[0]['file_name']
 
