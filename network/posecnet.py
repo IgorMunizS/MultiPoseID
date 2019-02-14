@@ -5,6 +5,8 @@ from utils.prn_forward_preprocess import get_prn_input, get_prn_output_shape
 import sys
 import os
 from scipy import ndimage
+import numpy as np
+import cv2
 
 from network.retinanet import *
 from network.prn_network import *
@@ -15,7 +17,7 @@ class PoseCNet():
 
     def __init__(self, bck_arch="resnet50", nb_keypoints = 18):
         self.nb_keypoints = nb_keypoints + 1  # K + 1(mask)
-        input_image = (480,480,3)
+        input_image = (None,None,3)
         height = 56
         width = 36
         node_count = 1024
@@ -106,5 +108,15 @@ class PoseCNet():
         self.model.load_weights(d_weights, by_name=True)
         self.model.load_weights(p_weights, by_name=True)
 
+
+    def predict(self,image):
+        shape_dst = np.max(image.shape)
+        self.scale = float(shape_dst) / 480
+        pad_size = np.abs(image.shape[1] - image.shape[0])
+        img_resized = np.pad(image, ([0, pad_size], [0, pad_size], [0, 0]), 'constant')[:shape_dst, :shape_dst]
+        self.img_input = cv2.resize(img_resized, (480, 480))
+        prediction = self.model.predict(np.expand_dims(self.img_input, 0))
+
+        return prediction
 
 # PoseCNet(bck_arch='resnet50')

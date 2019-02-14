@@ -162,7 +162,7 @@ def get_joint_list(img_orig, param, heatmaps, scale):
     return joint_list
 
 
-def draw(canvas, joints, bbox, color):
+def draw(canvas, joints, bbox, color, thickness):
 
 
     x1 = int(bbox[0])
@@ -176,7 +176,7 @@ def draw(canvas, joints, bbox, color):
             continue
         x = int(joints[i][0])
         y = int(joints[i][1])
-        cv2.circle(canvas, (x, y), 4, color[i], thickness=10)
+        cv2.circle(canvas, (x, y), 1, color[i], thickness=thickness)
 
         # cur_canvas = canvas.copy()
     # stickwidth = 2
@@ -194,7 +194,7 @@ def draw(canvas, joints, bbox, color):
 
     return canvas
 
-def plot_result(img_orig, result, color = None):
+def plot_result(img_orig, result, color = None, thickness = 5):
 
     if color is None:
         color = colors
@@ -212,5 +212,5 @@ def plot_result(img_orig, result, color = None):
         for i in range(len(x)):
             joints.append([x[i], y[i], v[i]])
 
-        img_orig = draw(img_orig, joints, bbox, color)
+        img_orig = draw(img_orig, joints, bbox, color, thickness)
     return img_orig
