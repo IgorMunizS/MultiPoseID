@@ -70,13 +70,6 @@ class CocoEval():
             joint_list = get_joint_list(oriImg, param, heatmaps[:, :, :18], 1)
             joint_list = joint_list.tolist()
 
-            joints = []
-            for joint in joint_list:
-                if int(joint[-1]) != 1:
-                    joint[-1] = max(0, int(joint[-1]) - 1)
-                joints.append(joint)
-            joint_list = joints
-
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
             for result in prn_result:
                 keypoints = result['keypoints']
