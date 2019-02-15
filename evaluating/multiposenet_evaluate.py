@@ -63,7 +63,7 @@ class CocoEval():
             flipped_heat, flipped_bbox_all = self.get_outputs(multiplier, swapped_img)
 
             # compute averaged heatmap
-            heatmaps = self.handle_heat(orig_heat, flipped_heat)
+            heatmaps = self.handle_heat(orig_heat[:,:,:18], flipped_heat[:,:,:18])
 
             # segment_map = heatmaps[:, :, 17]
             param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
@@ -147,7 +147,7 @@ class CocoEval():
             heatmap_avg = heatmap_avg + heatmap / len(multiplier)
 
             # bboxs
-            idxs = np.where(scores > 0.4)
+            idxs = np.where(scores > 0.5)
             bboxs = []
             for j in range(idxs[0].shape[0]):
                 bbox = boxes[idxs[0][j], :] / im_scale
