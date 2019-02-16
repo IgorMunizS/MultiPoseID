@@ -73,7 +73,7 @@ class CocoEval():
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
             for result in prn_result:
                 keypoints = result['keypoints']
-                del keypoints[3:6] #delete neck points
+                #del keypoints[3:6] #delete neck points
                 coco_keypoint = []
                 for i in range(17):
                     coco_keypoint.append(keypoints[coco_order[i] * 3])
