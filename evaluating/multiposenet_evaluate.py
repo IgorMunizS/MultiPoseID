@@ -48,7 +48,7 @@ class CocoEval():
         multipose_results = []
         coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
-        for img_id in tqdm(img_ids):
+        for img_id in tqdm(img_ids[:10]):
 
             img_name = coco.loadImgs(img_id)[0]['file_name']
 
@@ -67,7 +67,7 @@ class CocoEval():
 
             # segment_map = heatmaps[:, :, 17]
             param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
-            joint_list = get_joint_list(oriImg, param, heatmaps[:, :, :18], 1)
+            joint_list = get_joint_list(oriImg, param, heatmaps, 1)
             joint_list = joint_list.tolist()
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
@@ -89,7 +89,7 @@ class CocoEval():
         coco_pred = coco.loadRes(ann_filename)
         # run COCO evaluation
         coco_eval = COCOeval(coco, coco_pred, 'keypoints')
-        coco_eval.params.imgIds = img_ids
+        coco_eval.params.imgIds = img_ids[:10]
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
