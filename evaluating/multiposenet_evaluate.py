@@ -339,7 +339,7 @@ class CocoEval():
         my_keypoints = []
 
         for i in range(bbox_keypoints.shape[0]):
-            k = np.zeros(51)
+            k = np.zeros(54)
             k[0::3] = bbox_keypoints[i, :, 0]
             k[1::3] = bbox_keypoints[i, :, 1]
             k[2::3] = [2] * 18
