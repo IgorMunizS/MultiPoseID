@@ -27,9 +27,9 @@ class CocoEval():
 
 
         # load model
-        posecnet = PoseCNet(bck_arch=backbone)
-        self.model = posecnet.model
-        posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
+        self.posecnet = PoseCNet(bck_arch=backbone)
+        #self.model = self.posecnet.model
+        self.posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
                                      d_weights="../Models/inference_detection_resnet50_0.421.h5")
         # p_weights="../Models/prn_epoch20_final.h5"
 
@@ -137,7 +137,7 @@ class CocoEval():
             im_data = np.expand_dims(im_cropped, 0)
 
 
-            heatmaps, boxes, scores, labels = self.model.predict(im_data)
+            heatmaps, boxes, scores, labels = self.posecnet.model.predict(im_data)
             boxes = boxes[0]
             scores = scores[0]
 
@@ -342,7 +342,7 @@ class CocoEval():
             k = np.zeros(51)
             k[0::3] = bbox_keypoints[i, :, 0]
             k[1::3] = bbox_keypoints[i, :, 1]
-            k[2::3] = bbox_keypoints[i, :, 2]
+            k[2::3] = [2] * 17
 
             pose_score = 0
             count = 0
