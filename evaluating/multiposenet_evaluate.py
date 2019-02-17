@@ -64,11 +64,11 @@ class CocoEval():
             flipped_heat, flipped_bbox_all = self.get_outputs(multiplier, swapped_img)
 
             # compute averaged heatmap
-            heatmaps = self.handle_heat(orig_heat[:,:,:18], flipped_heat[:,:,:18])
+            heatmaps = self.handle_heat(orig_heat, flipped_heat)
 
             # segment_map = heatmaps[:, :, 17]
             param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
-            joint_list = get_joint_list(oriImg, param, heatmaps, 1)
+            joint_list = get_joint_list(oriImg, param, heatmaps[:,:,:18], 1)
             joint_list = joint_list.tolist()
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
@@ -138,8 +138,10 @@ class CocoEval():
 
 
             heatmaps, boxes, scores, labels = self.posecnet.model.predict(im_data)
+            heatmaps = heatmaps[0]
             boxes = boxes[0]
             scores = scores[0]
+            labels = labels[0]
 
             heatmap = heatmaps[0, :int(im_cropped.shape[0] / 4), :int(im_cropped.shape[1] / 4), :18]
             heatmap = cv2.resize(heatmap, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
@@ -154,8 +156,8 @@ class CocoEval():
             bboxs = []
             for j in range(idxs[0].shape[0]):
                 bbox = boxes[idxs[0][j], :] / im_scale
-                #if int(labels[idxs[0][j]]) == 0:  # class0=people
-                bboxs.append(bbox.tolist())
+                if int(labels[idxs[0][j]]) == 0:  # class0=people
+                    bboxs.append(bbox.tolist())
             bbox_all.append(bboxs)
 
 
@@ -191,7 +193,7 @@ class CocoEval():
                 if k[-1] == j:  # joint type
                     x = k[0]
                     y = k[1]
-                    v = k[2]
+                    v = 1
                     if v > 0:
                         t.append([x, y, 1, idx])
                         idx += 1
