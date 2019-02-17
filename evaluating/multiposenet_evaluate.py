@@ -47,7 +47,7 @@ class CocoEval():
 
 
         multipose_results = []
-        #coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
+        coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
         for img_id in tqdm(img_ids[:25]):
 
@@ -79,9 +79,9 @@ class CocoEval():
                     del keypoints[3:6] #delete neck points
                     coco_keypoint = []
                     for i in range(17):
-                        coco_keypoint.append(keypoints[i * 3])
-                        coco_keypoint.append(keypoints[i * 3 + 1])
-                        coco_keypoint.append(keypoints[i * 3 + 2])
+                        coco_keypoint.append(keypoints[coco_order[i] * 3])
+                        coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
+                        coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
                     result['keypoints'] = coco_keypoint
                     multipose_results.append(result)
 
