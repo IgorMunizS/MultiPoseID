@@ -46,9 +46,9 @@ class CocoEval():
 
 
         multipose_results = []
-        coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
+        coco_order = [0, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
 
-        for img_id in tqdm(img_ids):
+        for img_id in tqdm(img_ids[:25]):
 
             img_name = coco.loadImgs(img_id)[0]['file_name']
 
@@ -89,7 +89,7 @@ class CocoEval():
         coco_pred = coco.loadRes(ann_filename)
         # run COCO evaluation
         coco_eval = COCOeval(coco, coco_pred, 'keypoints')
-        coco_eval.params.imgIds = img_ids
+        coco_eval.params.imgIds = img_ids[:25]
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
