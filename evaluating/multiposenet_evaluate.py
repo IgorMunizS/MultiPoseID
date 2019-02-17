@@ -138,7 +138,6 @@ class CocoEval():
 
 
             heatmaps, boxes, scores, labels = self.posecnet.model.predict(im_data)
-            heatmaps = heatmaps[0]
             boxes = boxes[0]
             scores = scores[0]
             labels = labels[0]
