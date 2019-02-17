@@ -73,17 +73,17 @@ class CocoEval():
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
             for result in prn_result:
-                # keypoints = result['keypoints']
+                keypoints = result['keypoints']
                 # #del keypoints[3:6] #delete neck points
-                # coco_keypoint = []
-                # for i in range(17):
-                #     coco_keypoint.append(keypoints[coco_order[i] * 3])
-                #     coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
-                #     coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
-                # result['keypoints'] = coco_keypoint
+                coco_keypoint = []
+                for i in range(17):
+                    coco_keypoint.append(keypoints[i * 3])
+                    coco_keypoint.append(keypoints[i * 3 + 1])
+                    coco_keypoint.append(keypoints[i * 3 + 2])
+                result['keypoints'] = coco_keypoint
                 multipose_results.append(result)
 
-        ann_filename = 'val2017_MultiPoseNet_results_{}.json'.format('temporary')
+        ann_filename = 'val2017_MultiPoseNet_results.json'
         with open(ann_filename, "w") as f:
             json.dump(multipose_results, f, indent=4)
         # load results in COCO evaluation tool
@@ -242,7 +242,7 @@ class CocoEval():
         old_weights_bbox = np.copy(weights_bbox)
 
 
-        idx_in_coco = [0, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
+        # idx_in_coco = [0, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
 
 
         for j in range(weights_bbox.shape[0]):
@@ -252,7 +252,6 @@ class CocoEval():
         output_bbox = []
         for j in range(weights_bbox.shape[0]):
             inp = weights_bbox[j, :, :, 0, :]
-            self.inp_idx_coco = inp[...,self.idx_in_coco]
             output = self.prn_model.predict(np.expand_dims(inp, axis=0))
             output_coco = np.copy(output[0])
             output_coco = output_coco[...,[self.idx_in_coco.index(i) for i in range(18)]]
