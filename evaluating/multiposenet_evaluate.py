@@ -342,7 +342,7 @@ class CocoEval():
             k = np.zeros(54)
             k[0::3] = bbox_keypoints[i, :, 0]
             k[1::3] = bbox_keypoints[i, :, 1]
-            k[2::3] = bbox_keypoints[i, :, 2]
+            k[2::3] = [2] * 18
 
             pose_score = 0
             count = 0
