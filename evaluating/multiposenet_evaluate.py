@@ -46,7 +46,7 @@ class CocoEval():
 
 
         multipose_results = []
-        coco_order = [0, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
+        coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
         for img_id in tqdm(img_ids[:25]):
 
@@ -188,7 +188,7 @@ class CocoEval():
                 if k[-1] == j:  # joint type
                     x = k[0]
                     y = k[1]
-                    v = k[2]
+                    v = 1
                     if v > 0:
                         t.append([x, y, 1, idx])
                         idx += 1
@@ -252,9 +252,9 @@ class CocoEval():
             inp = weights_bbox[j, :, :, 0, :]
             # inp_idx_coco = inp[...,idx_in_coco]
             output = self.prn_model.predict(np.expand_dims(inp, axis=0))
-            output_coco = np.copy(output[0])
+            #output_coco = np.copy(output[0])
             # output_coco = output_coco[...,[idx_in_coco.index(i) for i in range(18)]]
-            output_bbox.append(output_coco)
+            output_bbox.append(output[0])
         #     output = prn_model.predict(np.expand_dims(inp, axis=0))
         #     output_bbox.append(output[0])
 
