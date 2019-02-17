@@ -206,7 +206,7 @@ class CocoEval():
             bboxes.append([bbox_item[0], bbox_item[1], bbox_item[2] - bbox_item[0], bbox_item[3] - bbox_item[1]])
 
         if len(bboxes) == 0 or len(peaks) == 0:
-            return 0
+            prn_result = 0
 
         weights_bbox = np.zeros((len(bboxes), h, w, 4, 18))
 
