@@ -353,13 +353,16 @@ class CocoEval():
 
             my_keypoints.append(k)
 
+
             image_data = {
-                'image_id': idx,
+                'image_id': image_id,
+                'file_name': file_name,
+                'category_id': 1,
                 'bbox': bboxes[i],
                 'score': pose_score,
-                'category_id': 1,
                 'keypoints': k.tolist()
             }
+
             prn_result.append(image_data)
 
         return prn_result
