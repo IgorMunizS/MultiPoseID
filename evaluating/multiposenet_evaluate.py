@@ -283,7 +283,7 @@ class CocoEval():
                 keypoint.append(s)
             keypoints_score.append(keypoint)
 
-        bbox_keypoints = np.zeros((weights_bbox.shape[0], 17, 3))
+        bbox_keypoints = np.zeros((weights_bbox.shape[0], 18, 3))
         bbox_ids = np.arange(len(bboxes)).tolist()
 
         # kp_id, bbox_id, kp_score, my_score
