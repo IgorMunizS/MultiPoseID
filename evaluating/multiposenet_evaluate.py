@@ -107,9 +107,7 @@ class CocoEval():
         :returns : list of float. The computed scales
         """
         scale_search = [0.5, 1., 1.5, 2, 2.5]
-        a = [1.]
-        a.extend([x * 480 / float(img.shape[0]) for x in scale_search])
-        return a
+        return [x * 480 / float(img.shape[0]) for x in scale_search]
 
     def get_outputs(self, multiplier, img):
         """Computes the averaged heatmap and paf for the given image
@@ -344,7 +342,7 @@ class CocoEval():
             k = np.zeros(54)
             k[0::3] = bbox_keypoints[i, :, 0]
             k[1::3] = bbox_keypoints[i, :, 1]
-            k[2::3] = [2] * 18
+            k[2::3] = bbox_keypoints[i, :, 2]
 
             pose_score = 0
             count = 0
