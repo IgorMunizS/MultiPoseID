@@ -35,7 +35,7 @@ class CocoEval():
 
         self.prn_model = PRN_Seperate(56, 36, 1024)
         self.prn_model.load_weights("../Models/prn_epoch20_final.h5")
-        self.idx_in_coco = [0, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
+        self.idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
 
 
 
@@ -73,14 +73,14 @@ class CocoEval():
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
             for result in prn_result:
-                keypoints = result['keypoints']
-                # #del keypoints[3:6] #delete neck points
-                coco_keypoint = []
-                for i in range(17):
-                    coco_keypoint.append(keypoints[i * 3])
-                    coco_keypoint.append(keypoints[i * 3 + 1])
-                    coco_keypoint.append(keypoints[i * 3 + 2])
-                result['keypoints'] = coco_keypoint
+                # keypoints = result['keypoints']
+                # # #del keypoints[3:6] #delete neck points
+                # coco_keypoint = []
+                # for i in range(17):
+                #     coco_keypoint.append(keypoints[i * 3])
+                #     coco_keypoint.append(keypoints[i * 3 + 1])
+                #     coco_keypoint.append(keypoints[i * 3 + 2])
+                # result['keypoints'] = coco_keypoint
                 multipose_results.append(result)
 
         ann_filename = 'val2017_MultiPoseNet_results.json'
