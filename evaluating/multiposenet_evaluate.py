@@ -71,7 +71,7 @@ class CocoEval():
             joint_list = get_joint_list(oriImg, param, heatmaps, 1)
             joint_list = joint_list.tolist()
 
-            prn_result = self.prn_network(joint_list, orig_bbox_all[0], img_name, img_id)
+            prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
 
             if prn_result != 0:
                 for result in prn_result:
@@ -342,7 +342,7 @@ class CocoEval():
             k = np.zeros(54)
             k[0::3] = bbox_keypoints[i, :, 0]
             k[1::3] = bbox_keypoints[i, :, 1]
-            k[2::3] = [2] * 18
+            k[2::3] = bbox_keypoints[i, :, 2]
 
             pose_score = 0
             count = 0
