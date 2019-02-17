@@ -107,7 +107,8 @@ class CocoEval():
         :returns : list of float. The computed scales
         """
         scale_search = [0.5, 1., 1.5, 2, 2.5]
-        return [x * 480 / float(img.shape[0]) for x in scale_search]
+        a = [1.]
+        return a.extend([x * 480 / float(img.shape[0]) for x in scale_search])
 
     def get_outputs(self, multiplier, img):
         """Computes the averaged heatmap and paf for the given image
