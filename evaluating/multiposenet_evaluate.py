@@ -72,16 +72,18 @@ class CocoEval():
             joint_list = joint_list.tolist()
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
-            for result in prn_result:
-                # keypoints = result['keypoints']
-                # # #del keypoints[3:6] #delete neck points
-                # coco_keypoint = []
-                # for i in range(17):
-                #     coco_keypoint.append(keypoints[i * 3])
-                #     coco_keypoint.append(keypoints[i * 3 + 1])
-                #     coco_keypoint.append(keypoints[i * 3 + 2])
-                # result['keypoints'] = coco_keypoint
-                multipose_results.append(result)
+
+            if prn_result != 0:
+                for result in prn_result:
+                    # keypoints = result['keypoints']
+                    # # #del keypoints[3:6] #delete neck points
+                    # coco_keypoint = []
+                    # for i in range(17):
+                    #     coco_keypoint.append(keypoints[i * 3])
+                    #     coco_keypoint.append(keypoints[i * 3 + 1])
+                    #     coco_keypoint.append(keypoints[i * 3 + 2])
+                    # result['keypoints'] = coco_keypoint
+                    multipose_results.append(result)
 
         ann_filename = 'val2017_MultiPoseNet_results.json'
         with open(ann_filename, "w") as f:
@@ -204,9 +206,7 @@ class CocoEval():
             bboxes.append([bbox_item[0], bbox_item[1], bbox_item[2] - bbox_item[0], bbox_item[3] - bbox_item[1]])
 
         if len(bboxes) == 0 or len(peaks) == 0:
-            print("Len bboxes 0 / peaks 0")
-            print(file_name)
-            prn_result = 0
+            return 0
 
         weights_bbox = np.zeros((len(bboxes), h, w, 4, 18))
 
