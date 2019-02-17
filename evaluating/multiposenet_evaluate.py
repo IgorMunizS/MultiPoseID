@@ -191,7 +191,7 @@ class CocoEval():
                 if k[-1] == j:  # joint type
                     x = k[0]
                     y = k[1]
-                    v = 1
+                    v = k[2]
                     if v > 0:
                         t.append([x, y, 1, idx])
                         idx += 1
