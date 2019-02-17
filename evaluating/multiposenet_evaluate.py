@@ -35,7 +35,7 @@ class CocoEval():
 
         self.prn_model = PRN_Seperate(56, 36, 1024)
         self.prn_model.load_weights("../Models/prn_epoch20_final.h5")
-        self.idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
+        self.idx_in_coco = [0, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
 
 
 
@@ -205,6 +205,7 @@ class CocoEval():
 
         if len(bboxes) == 0 or len(peaks) == 0:
             print("Len bboxes 0 / peaks 0")
+            print(file_name)
             prn_result = 0
 
         weights_bbox = np.zeros((len(bboxes), h, w, 4, 18))
