@@ -80,18 +80,18 @@ class CocoEval():
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
 
-            if prn_result != 0:
-                for result in prn_result:
-                    result_copy = copy.deepcopy(result)
-                    keypoints = result_copy['keypoints']
-                    del keypoints[3:6]  # delete neck points
-                    coco_keypoint = []
-                    for i in range(17):
-                        coco_keypoint.append(keypoints[coco_order[i] * 3])
-                        coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
-                        coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
-                    result_copy['keypoints'] = coco_keypoint
-                    multipose_results.append(result_copy)
+
+            for result in prn_result:
+                result_copy = copy.deepcopy(result)
+                keypoints = result_copy['keypoints']
+                del keypoints[3:6]  # delete neck points
+                coco_keypoint = []
+                for i in range(17):
+                    coco_keypoint.append(keypoints[coco_order[i] * 3])
+                    coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
+                    coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
+                result_copy['keypoints'] = coco_keypoint
+                multipose_results.append(result_copy)
 
         ann_filename = 'val2017_MultiPoseNet_results.json'
         with open(ann_filename, "w") as f:
