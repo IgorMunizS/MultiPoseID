@@ -50,7 +50,7 @@ class CocoEval():
             image_folder = "val2014/"
 
         coco = COCO(coco_val)
-        img_ids = sorted(coco.getImgIds(catIds=[1]))[:50]
+        img_ids = sorted(coco.getImgIds(catIds=[1]))[:10]
 
 
         multipose_results = []
@@ -84,7 +84,7 @@ class CocoEval():
             for result in prn_result:
                 result_copy = copy.deepcopy(result)
                 keypoints = result_copy['keypoints']
-                del keypoints[3:6]  # delete neck points
+                #del keypoints[3:6]  # delete neck points
                 coco_keypoint = []
                 for i in range(17):
                     coco_keypoint.append(keypoints[coco_order[i] * 3])
