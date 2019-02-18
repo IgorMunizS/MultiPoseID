@@ -56,7 +56,7 @@ class CocoEval():
         multipose_results = []
         coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
-        for img_id in tqdm(img_ids[:50]):
+        for img_id in tqdm(img_ids[:10]):
 
             img_name = coco.loadImgs(img_id)[0]['file_name']
 
@@ -100,7 +100,7 @@ class CocoEval():
         coco_pred = coco.loadRes(ann_filename)
         # run COCO evaluation
         coco_eval = COCOeval(coco, coco_pred, 'keypoints')
-        coco_eval.params.imgIds = img_ids[:50]
+        coco_eval.params.imgIds = img_ids[:10]
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
@@ -189,7 +189,6 @@ class CocoEval():
 
         in_thres = 0.21
         kps = joint_list
-        prn_result = []
         bbox_list = bboxs
 
         idx = 0
@@ -215,7 +214,8 @@ class CocoEval():
             bboxes.append([bbox_item[0], bbox_item[1], bbox_item[2] - bbox_item[0], bbox_item[3] - bbox_item[1]])
 
         if len(bboxes) == 0 or len(peaks) == 0:
-            return prn_result
+            # return prn_result
+            prn_result = 0
 
         weights_bbox = np.zeros((len(bboxes), h, w, 4, 18))
 
@@ -268,6 +268,7 @@ class CocoEval():
             output_bbox.append(output[0])
 
         output_bbox = np.array(output_bbox)
+        prn_result = []
 
         keypoints_score = []
 
