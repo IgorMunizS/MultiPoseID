@@ -82,16 +82,16 @@ class CocoEval():
 
 
             for result in prn_result:
-                result_copy = copy.deepcopy(result)
-                keypoints = result_copy['keypoints']
-                #del keypoints[3:6]  # delete neck points
-                coco_keypoint = []
-                for i in range(17):
-                    coco_keypoint.append(keypoints[coco_order[i] * 3])
-                    coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
-                    coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
-                result_copy['keypoints'] = coco_keypoint
-                multipose_results.append(result_copy)
+                # result_copy = copy.deepcopy(result)
+                # keypoints = result_copy['keypoints']
+                # del keypoints[3:6]  # delete neck points
+                # coco_keypoint = []
+                # for i in range(17):
+                #     coco_keypoint.append(keypoints[coco_order[i] * 3])
+                #     coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
+                #     coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
+                # result_copy['keypoints'] = coco_keypoint
+                multipose_results.append(result)
 
         ann_filename = 'val2017_MultiPoseNet_results.json'
         with open(ann_filename, "w") as f:
@@ -263,16 +263,16 @@ class CocoEval():
         for j in range(weights_bbox.shape[0]):
             inp = weights_bbox[j, :, :, 0, :]
             output = self.prn_model.predict([[inp]])
-            #output_coco = np.copy(output[0])
-            # output_coco = output_coco[...,[self.idx_in_coco.index(i) for i in range(18)]]
-            output_bbox.append(output[0])
+            output_coco = np.copy(output[0])
+            output_coco = output_coco[...,[self.idx_in_coco.index(i) for i in range(18)]]
+            output_bbox.append(output_coco)
 
         output_bbox = np.array(output_bbox)
 
         keypoints_score = []
 
         # coco eval doesn't have neck keypoint, from here we only use 17
-        for t in range(18):
+        for t in range(17):
             indexes = np.argwhere(old_weights_bbox[:, :, :, 0, t] == 1)
             keypoint = []
             for i in indexes:
@@ -291,11 +291,11 @@ class CocoEval():
                 keypoint.append(s)
             keypoints_score.append(keypoint)
 
-        bbox_keypoints = np.zeros((weights_bbox.shape[0], 18, 3))
+        bbox_keypoints = np.zeros((weights_bbox.shape[0], 17, 3))
         bbox_ids = np.arange(len(bboxes)).tolist()
 
         # kp_id, bbox_id, kp_score, my_score
-        for i in range(18):
+        for i in range(17):
             joint_keypoints = keypoints_score[i]
             if len(joint_keypoints) > 0:
 
@@ -337,7 +337,7 @@ class CocoEval():
                     x_scale = float(w) / math.ceil(b[2])
                     y_scale = float(h) / math.ceil(b[3])
 
-                    for t in range(18):
+                    for t in range(17):
                         indexes = np.argwhere(old_weights_bbox[j, :, :, 0, t] == 1)
                         if len(indexes) == 0:
                             max_index = np.argwhere(output_bbox[j, :, :, t] == np.max(output_bbox[j, :, :, t]))
@@ -347,18 +347,18 @@ class CocoEval():
         my_keypoints = []
 
         for i in range(bbox_keypoints.shape[0]):
-            k = np.zeros(54)
+            k = np.zeros(51)
             k[0::3] = bbox_keypoints[i, :, 0]
             k[1::3] = bbox_keypoints[i, :, 1]
             k[2::3] = bbox_keypoints[i, :, 2]
 
             pose_score = 0
             count = 0
-            for f in range(18):
+            for f in range(17):
                 if bbox_keypoints[i, f, 0] != 0 and bbox_keypoints[i, f, 1] != 0:
                     count += 1
                 pose_score += bbox_keypoints[i, f, 2]
-            pose_score /= 18.0
+            pose_score /= 17.0
 
             my_keypoints.append(k)
 
