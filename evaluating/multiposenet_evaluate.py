@@ -50,13 +50,13 @@ class CocoEval():
             image_folder = "val2014/"
 
         coco = COCO(coco_val)
-        img_ids = coco.getImgIds(catIds=[1])
+        img_ids = sorted(coco.getImgIds(catIds=[1]))
 
 
         multipose_results = []
         coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
-        for img_id in tqdm(img_ids[:10]):
+        for img_id in tqdm(img_ids[:50]):
 
             img_name = coco.loadImgs(img_id)[0]['file_name']
 
@@ -100,7 +100,7 @@ class CocoEval():
         coco_pred = coco.loadRes(ann_filename)
         # run COCO evaluation
         coco_eval = COCOeval(coco, coco_pred, 'keypoints')
-        coco_eval.params.imgIds = img_ids[:10]
+        coco_eval.params.imgIds = img_ids[:50]
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
