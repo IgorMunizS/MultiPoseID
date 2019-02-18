@@ -50,7 +50,7 @@ class CocoEval():
             image_folder = "val2014/"
 
         coco = COCO(coco_val)
-        img_ids = sorted(coco.getImgIds(catIds=[1]))[:10]
+        img_ids = sorted(coco.getImgIds(catIds=[1]))[:100]
 
 
         multipose_results = []
