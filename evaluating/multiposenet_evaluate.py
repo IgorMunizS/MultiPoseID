@@ -40,9 +40,12 @@ class CocoEval():
 
 
 
-    def coco_eval(self, coco_dir, write_json=False):
+    def coco_eval(self, coco_dir, dataset, write_json=False):
 
-        coco_val = os.path.join(coco_dir, 'annotations/person_keypoints_val2017.json')
+        if dataset == "2017":
+            coco_val = os.path.join(coco_dir, 'annotations/person_keypoints_val2017.json')
+        else:
+            coco_val = os.path.join(coco_dir, 'annotations/person_keypoints_val2014.json')
         coco = COCO(coco_val)
         img_ids = coco.getImgIds(catIds=[1])
 
@@ -431,6 +434,7 @@ def parse_args(args):
 
     parser.add_argument('--coco_dir', help='Path to coco main dir')
     parser.add_argument('--backbone', help='Network backbone')
+    parser.add_argument('--dataset', help="Coco 2014 or 2017", default="2017")
 
     return parser.parse_args(args)
 
@@ -442,7 +446,7 @@ def main(args=None):
     args = parse_args(args)
 
     cocoeval = CocoEval("resnet50")
-    cocoeval.coco_eval(args.coco_dir)
+    cocoeval.coco_eval(args.coco_dir, args.dataset)
 
 
 if __name__ == '__main__':
