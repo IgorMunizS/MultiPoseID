@@ -31,7 +31,7 @@ class CocoEval():
         self.posecnet = PoseCNet(bck_arch=backbone)
         #self.model = self.posecnet.model
         self.posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
-                                     d_weights="../Models/inference_detection_resnet50_0.421.h5")
+                                     d_weights="../Models/inference_detection_resnet50_epoch10_0.281.h5")
         # p_weights="../Models/prn_epoch20_final.h5"
 
         self.prn_model = PRN_Seperate(56, 36, 1024)
