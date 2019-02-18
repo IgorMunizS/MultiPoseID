@@ -16,6 +16,7 @@ from utils.prn_gaussian import gaussian, crop
 from network.prn_network import *
 from network.posecnet import PoseCNet
 import argparse
+import copy
 
 
 
@@ -49,7 +50,7 @@ class CocoEval():
         multipose_results = []
         coco_order = [0, 14, 13, 16, 15, 4, 1, 5, 2, 6, 3, 10, 7, 11, 8, 12, 9]
 
-        for img_id in tqdm(img_ids[:500]):
+        for img_id in tqdm(img_ids[5:7]):
 
             img_name = coco.loadImgs(img_id)[0]['file_name']
 
@@ -75,15 +76,16 @@ class CocoEval():
 
             if prn_result != 0:
                 for result in prn_result:
-                    keypoints = result['keypoints']
-                    del keypoints[3:6] #delete neck points
+                    result_copy = copy.deepcopy(result)
+                    keypoints = result_copy['keypoints']
+                    del keypoints[3:6]  # delete neck points
                     coco_keypoint = []
                     for i in range(17):
                         coco_keypoint.append(keypoints[coco_order[i] * 3])
                         coco_keypoint.append(keypoints[coco_order[i] * 3 + 1])
                         coco_keypoint.append(keypoints[coco_order[i] * 3 + 2])
-                    result['keypoints'] = coco_keypoint
-                    multipose_results.append(result)
+                    result_copy['keypoints'] = coco_keypoint
+                    multipose_results.append(result_copy)
 
         ann_filename = 'val2017_MultiPoseNet_results.json'
         with open(ann_filename, "w") as f:
@@ -92,7 +94,7 @@ class CocoEval():
         coco_pred = coco.loadRes(ann_filename)
         # run COCO evaluation
         coco_eval = COCOeval(coco, coco_pred, 'keypoints')
-        coco_eval.params.imgIds = img_ids[:500]
+        coco_eval.params.imgIds = img_ids[5:7]
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
