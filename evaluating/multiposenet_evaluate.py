@@ -47,7 +47,7 @@ class CocoEval():
         else:
             coco_val = os.path.join(coco_dir, 'annotations/person_keypoints_val2014.json')
         coco = COCO(coco_val)
-        img_ids = coco.getImgIds(catIds=[1])
+        img_ids = sorted(coco.getImgIds(catIds=[1]))
 
 
         multipose_results = []
