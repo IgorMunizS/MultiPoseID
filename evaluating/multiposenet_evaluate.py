@@ -44,8 +44,11 @@ class CocoEval():
 
         if dataset == "2017":
             coco_val = os.path.join(coco_dir, 'annotations/person_keypoints_val2017.json')
+            image_folder = "val2017/"
         else:
             coco_val = os.path.join(coco_dir, 'annotations/person_keypoints_val2014.json')
+            image_folder = "val2014/"
+
         coco = COCO(coco_val)
         img_ids = sorted(coco.getImgIds(catIds=[1]))
 
@@ -57,7 +60,7 @@ class CocoEval():
 
             img_name = coco.loadImgs(img_id)[0]['file_name']
 
-            oriImg = cv2.imread(os.path.join(coco_dir, 'val2017/', img_name))
+            oriImg = cv2.imread(os.path.join(coco_dir,image_folder, img_name))
             multiplier = self.get_multiplier(oriImg)
 
             # Get results of original image
