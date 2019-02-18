@@ -215,6 +215,7 @@ class CocoEval():
 
         if len(bboxes) == 0 or len(peaks) == 0:
             # return prn_result
+            print(file_name)
             prn_result = 0
 
         weights_bbox = np.zeros((len(bboxes), h, w, 4, 18))
