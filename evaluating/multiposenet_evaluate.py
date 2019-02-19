@@ -147,15 +147,11 @@ class CocoEval():
 
 
             heatmaps, boxes, scores, labels = self.posecnet.model.predict(im_data)
+
+            boxes, scores, labels = self.retinanet.predict(im_data)
             boxes = boxes[0]
             scores = scores[0]
             labels = labels[0]
-
-            if m == 1:
-                boxes, scores, labels = self.retinanet.predict(im_data)
-                boxes = boxes[0]
-                scores = scores[0]
-                labels = labels[0]
 
             heatmap = heatmaps[0, :int(im_cropped.shape[0] / 4), :int(im_cropped.shape[1] / 4), :18]
             heatmap = cv2.resize(heatmap, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
@@ -166,7 +162,7 @@ class CocoEval():
             heatmap_avg = heatmap_avg + heatmap / len(multiplier)
 
             # bboxs
-            idxs = np.where(scores > 0.4)
+            idxs = np.where(scores > 0.5)
             bboxs = []
             for j in range(idxs[0].shape[0]):
                 bbox = boxes[idxs[0][j], :] / im_scale
