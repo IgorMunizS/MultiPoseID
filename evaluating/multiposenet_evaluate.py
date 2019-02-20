@@ -44,7 +44,7 @@ class CocoEval():
         C2, C3, C4, C5 = self.backbone.model.output
         retina_net = retinanet(self.backbone.model.input, [C3, C4, C5], 1)
         retina_bbox = retinanet_bbox(retina_net)
-        self.retinanet = Model(inputs=self.backbone.input, outputs=retina_bbox.output)
+        self.retinanet = Model(inputs=retina_bbox.input, outputs=retina_bbox.output)
         self.retinanet.load_weights("../Models/inference_detection_resnet50_0.421.h5")
         self.prn_model = PRN_Seperate(56, 36, 1024)
         self.prn_model.load_weights("../Models/prn_epoch20_final.h5")
