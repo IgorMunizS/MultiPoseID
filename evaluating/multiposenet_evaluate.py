@@ -32,20 +32,12 @@ class CocoEval():
 
 
         # load model
-        # self.posecnet = PoseCNet(bck_arch=backbone)
-        #self.model = self.posecnet.model
-        # self.posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
-        #                              d_weights="../Models/inference_detection_resnet50_0.421.h5")
+        self.posecnet = PoseCNet(bck_arch=backbone)
+        self.model = self.posecnet.model
+        self.posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
+                                     d_weights="../Models/detection_resnet50_0.421.h5")
         # p_weights="../Models/prn_epoch20_final.h5"
-        self.keypointnet = KeypointNet(18, prediction=True)
-        self.keypointnet.model.load_weights("../Models/model.85-86.60.hdf5")
-        # self.retinanet = load_model("../keras-retinanet/snapshots/resnet50_coco_best_v2.1.0.h5")
-        self.backbone = Backbone((None,None,3), backbone)
-        C2, C3, C4, C5 = self.backbone.model.output
-        retina_net = retinanet(self.backbone.model.input, [C3, C4, C5], 1)
-        retina_bbox = retinanet_bbox(retina_net)
-        self.retinanet = Model(inputs=retina_bbox.input, outputs=retina_bbox.output)
-        self.retinanet.load_weights("../Models/inference_detection_resnet50_0.421.h5")
+
         self.prn_model = PRN_Seperate(56, 36, 1024)
         self.prn_model.load_weights("../Models/prn_epoch20_final.h5")
         self.idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
@@ -157,15 +149,13 @@ class CocoEval():
             im_data = np.expand_dims(im_cropped, 0)
 
 
-            heatmaps = self.keypointnet.model.predict(im_data)
-
-
-            # if m == 1:
-
-            boxes, scores, labels = self.retinanet.predict(im_data)
+            heatmaps, boxes, scores, labels = self.model.model.predict(im_data)
             boxes = boxes[0]
             scores = scores[0]
             labels = labels[0]
+
+            # if m == 1:
+
 
             heatmap = heatmaps[0, :int(im_cropped.shape[0] / 4), :int(im_cropped.shape[1] / 4), :18]
             heatmap = cv2.resize(heatmap, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
