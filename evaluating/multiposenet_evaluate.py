@@ -20,6 +20,9 @@ import argparse
 import copy
 from keras_retinanet.models import load_model
 from network.keypoint_net import  KeypointNet
+from network.backbone import Backbone
+from network.retinanet import *
+from keras.models import Model
 
 class CocoEval():
 
@@ -36,7 +39,13 @@ class CocoEval():
         # p_weights="../Models/prn_epoch20_final.h5"
         self.keypointnet = KeypointNet(18, prediction=True)
         self.keypointnet.model.load_weights("../Models/model.85-86.60.hdf5")
-        self.retinanet = load_model("../keras-retinanet/snapshots/resnet50_coco_best_v2.1.0.h5")
+        # self.retinanet = load_model("../keras-retinanet/snapshots/resnet50_coco_best_v2.1.0.h5")
+        self.backbone = Backbone((None,None,3), backbone)
+        C2, C3, C4, C5 = self.backbone.model.output
+        retina_net = retinanet(self.backbone.model.input, [C3, C4, C5], 1)
+        retina_bbox = retinanet_bbox(retina_net)
+        self.retinanet = Model(inputs=self.backbone.input, outputs=retina_bbox.output)
+        self.retinanet.load_weights("../Models/inference_detection_resnet50_0.421.h5")
         self.prn_model = PRN_Seperate(56, 36, 1024)
         self.prn_model.load_weights("../Models/prn_epoch20_final.h5")
         self.idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
