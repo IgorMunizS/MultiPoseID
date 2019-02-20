@@ -149,7 +149,7 @@ class CocoEval():
             im_data = np.expand_dims(im_cropped, 0)
 
 
-            heatmaps, boxes, scores, labels = self.model.model.predict(im_data)
+            heatmaps, boxes, scores, labels = self.model.predict(im_data)
             boxes = boxes[0]
             scores = scores[0]
             labels = labels[0]
