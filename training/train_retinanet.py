@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+
 import argparse
 import os
 import sys
@@ -181,7 +182,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         checkpoint = keras.callbacks.ModelCheckpoint(
             os.path.join(
                 args.snapshot_path,
-                '{backbone}_{dataset_type}_{{epoch:02d}}.h5'.format(backbone=args.backbone, dataset_type=args.dataset_type)
+                '{backbone}_{dataset_type}_{{epoch:02d}}_{{loss:.2f}}.h5'.format(backbone=args.backbone, dataset_type=args.dataset_type)
             ),
             verbose=1,
             # save_best_only=True,

@@ -31,16 +31,6 @@ training_log = "training.csv"
 logs_dir = "./logs"
 
 
-def get_last_epoch():
-    """
-    Retrieves last epoch from log file updated during training.
-
-    :return: epoch number
-    """
-    data = pandas.read_csv(training_log)
-    return max(data['epoch'].values)
-
-
 
 def get_loss_funcs():
     """
