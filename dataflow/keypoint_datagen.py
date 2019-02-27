@@ -18,8 +18,8 @@ ALL_HEATMAP_MASK = np.repeat(
     np.ones((120, 120, 1), dtype=np.uint8), 19, axis=2)
 
 AUGMENTORS_LIST = [
-        ScaleAug(scale_min=0.8,
-                 scale_max=1.2,
+        ScaleAug(scale_min=0.5,
+                 scale_max=1.1,
                  target_dist=0.6,
                  interp=cv2.INTER_CUBIC),
 
@@ -31,7 +31,7 @@ AUGMENTORS_LIST = [
         CropAug(480, 480, center_perterb_max=40, border_value=(128, 128, 128),
                  mask_border_val=1),
 
-        FlipAug(num_parts=18, prob=0.3),
+        FlipAug(num_parts=18, prob=0.5),
     ]
 
 
@@ -172,7 +172,8 @@ def build_sample(components):
     meta.img = None
     meta.aug_joints = None
     meta.aug_center = None
-    return [image.astype(np.uint8), mask_heatmap, heatmap]
+    image = preprocess_image(image.astype(np.float32), mode='tf')
+    return [image, mask_heatmap, heatmap]
 
 
 def get_dataflow(coco_data_paths):

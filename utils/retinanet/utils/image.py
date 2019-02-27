@@ -29,9 +29,10 @@ def read_image_bgr(path):
     Args
         path: Path to the image.
     """
-    image = np.asarray(Image.open(path).convert('RGB'))
-    return image[:, :, ::-1].copy()
-
+    # image = np.asarray(Image.open(path).convert('RGB'))
+    image = cv2.imread(path)
+    #return image[:, :, ::-1].copy()
+    return image
 
 
 def adjust_transform_for_image(transform, image, relative_translation):
