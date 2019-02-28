@@ -94,7 +94,7 @@ def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=Non
     if backbone == 'resnet50':
         resnet = resnets.ResNet50(include_top=False, weights=None, input_tensor=inputs)
     elif backbone == 'resnet101':
-        resnet = resnets.ResNet50(include_top=False, weights=None, input_tensor=inputs)
+        resnet = resnets.ResNet101(include_top=False, weights=None, input_tensor=inputs)
     elif backbone == 'resnetx50':
         resnet = resnets.ResNeXt50(include_top=False, weights=None, input_tensor=inputs)
 
