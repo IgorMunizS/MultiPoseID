@@ -192,7 +192,7 @@ if __name__ == '__main__':
     )
     checkpoint = ModelCheckpoint("model.{epoch:02d}-{val_loss:.2f}.hdf5", monitor='val_loss',
                                  verbose=0, save_best_only=False,
-                                 save_weights_only=True, mode='min', period=1)
+                                 save_weights_only=False, mode='min', period=1)
     csv_logger = CSVLogger(training_log, append=True)
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
