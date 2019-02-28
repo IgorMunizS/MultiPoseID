@@ -110,7 +110,7 @@ if __name__ == '__main__':
     parser.add_argument('--steps', default=3000, type=int)
     parser.add_argument('--multiprocessing', default=False, type=bool)
     parser.add_argument('--workers', default=1, type=bool)
-
+    parser.add_argument('--lr', default=1e-4, type=float)
     args = parser.parse_args()
 
 
@@ -200,7 +200,7 @@ if __name__ == '__main__':
     callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
 
 
-    opt = Adam(lr=1e-4)
+    opt = Adam(lr=args.lr)
     # start training
     # steps_per_epoch = 5000
     print(args.steps)
