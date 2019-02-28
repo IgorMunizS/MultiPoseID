@@ -9,7 +9,7 @@ import argparse
 import keras.backend as K
 from keras.callbacks import LearningRateScheduler, ModelCheckpoint, CSVLogger, TensorBoard, ReduceLROnPlateau
 from keras.optimizers import Adam
-
+from keras.models import load_model
 
 from network.keypoint_net import KeypointNet
 
@@ -121,9 +121,9 @@ if __name__ == '__main__':
     #last_epoch = restore_weights("../model/squeeze_imagenet.h5", model)
 
     if args.checkpoint:
-        model = KeypointNet(18, args.backbone, False, None).model
-        model.load_weights(args.checkpoint)
-
+        #model = KeypointNet(18, args.backbone, False, None).model
+        #model.load_weights(args.checkpoint)
+        model = load_model(args.checkpoint)
     else:
         model = KeypointNet(18, args.backbone, False, args.weights).model
 
@@ -206,7 +206,9 @@ if __name__ == '__main__':
     print(args.steps)
     print(val_samples // batch_size)
     loss_funcs = get_loss_funcs()
-    model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
+
+    if not args.checkpoint:
+        model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
                         steps_per_epoch=args.steps,
                         epochs=args.epochs,
