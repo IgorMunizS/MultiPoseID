@@ -59,6 +59,10 @@ def get_loss_funcs():
 
     return losses
 
+def eucl_loss(x, y):
+    l = K.sum(K.square(x - y)) / batch_size / 2
+    return l
+
 
 def step_decay(epoch, iterations_per_epoch):
     """
@@ -174,16 +178,16 @@ if __name__ == '__main__':
 
     # configure callbacks
 
-    iterations_per_epoch = train_samples // batch_size
-    _step_decay = partial(step_decay,
-                          iterations_per_epoch=iterations_per_epoch
-                          )
-    lrate = LearningRateScheduler(_step_decay)
+    # iterations_per_epoch = train_samples // batch_size
+    # _step_decay = partial(step_decay,
+    #                       iterations_per_epoch=iterations_per_epoch
+    #                       )
+    # lrate = LearningRateScheduler(_step_decay)
 
     reducelr = ReduceLROnPlateau(
-        monitor='loss',
+        monitor='val_loss',
         factor=0.1,
-        patience=2,
+        patience=3,
         verbose=1,
         mode='auto',
         epsilon=0.0001,
@@ -197,7 +201,7 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
+    callbacks_list = [checkpoint, csv_logger, tb, reducelr]
 
 
     opt = Adam(lr=args.lr)
@@ -208,7 +212,7 @@ if __name__ == '__main__':
     loss_funcs = get_loss_funcs()
 
     if not args.checkpoint:
-        model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
+        model.compile(loss=eucl_loss, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
                         steps_per_epoch=args.steps,
                         epochs=args.epochs,

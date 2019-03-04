@@ -12,14 +12,19 @@ from scipy.ndimage.morphology import generate_binary_structure
 #     [0, 170, 255], [0, 85, 255], [0, 0, 255], [85, 0, 255], [170, 0, 255],
 #     [255, 0, 255], [255, 0, 170], [255, 0, 85], [255, 0, 0]]
 
+# idx_in_coco_str = [
+#         'Nose','Neck','RShoulder','RElbow','RWrist','LShoulder','LElbow','LWrist',
+#         'RHip','RKnee','RAnkle','LHip','LKnee','LAnkle','REye','LEye','REar','LEar']
+
+
 colors = [
-    [255, 0, 0], [255, 0, 0], [255, 0, 255], [255, 0, 0], [255, 0, 0],
+    [255, 0, 255], [255, 0, 0], [255, 0, 0], [255, 0, 0], [255, 0, 0],
     [255, 0, 0], [255, 0, 0], [255, 0, 0], [255, 0, 0], [255, 0, 0],
     [255, 0, 0], [255, 0, 0], [255, 0, 0], [255, 0, 0], [255, 0, 0],
     [255, 0, 0], [255, 0, 0], [255, 0, 0]]
 
-limbSeq = [[0,1], [1,2], [2,3], [0,4], [4,5], [5,6], [0,7], [7,8], [8,9], [0,10], [10,11], [11,12], \
-[0,13], [13,15], [0,14],[14,16]]
+limbSeq = [[0,1], [1,2], [2,3], [3,4], [1,5], [5,6], [6,7], [2,8], [8,9], [9,10], [8,11],[5,11], [11,12], \
+[12,13], [0,14], [0,15],[14,16],[15,17]]
 
 
 NUM_JOINTS = 18
@@ -179,18 +184,18 @@ def draw(canvas, joints, bbox, color, thickness):
         cv2.circle(canvas, (x, y), 1, color[i], thickness=thickness)
 
         # cur_canvas = canvas.copy()
-    # stickwidth = 2
-    # for i in range(16):
-    #     if joints[limbSeq[i][0]][2] == 0 or joints[limbSeq[i][1]][2] == 0:
-    #         continue
-    #     X = (int(joints[limbSeq[i][0]][0]), int(joints[limbSeq[i][1]][0]))
-    #     Y = (int(joints[limbSeq[i][0]][1]), int(joints[limbSeq[i][1]][1]))
-    #     mX = np.mean(X)
-    #     mY = np.mean(Y)
-    #     length = ((X[0] - X[1]) ** 2 + (Y[0] - Y[1]) ** 2) ** 0.5
-    #     angle = math.degrees(math.atan2(Y[0] - Y[1], X[0] - X[1]))
-    #     polygon = cv2.ellipse2Poly((int(mX), int(mY)), (int(length / 2), stickwidth), int(angle), 0, 360, 1)
-    #     cv2.fillConvexPoly(canvas, polygon, colors[i])
+    stickwidth = 2
+    for i in range(18):
+        if joints[limbSeq[i][0]][2] == 0 or joints[limbSeq[i][1]][2] == 0:
+            continue
+        X = (int(joints[limbSeq[i][0]][0]), int(joints[limbSeq[i][1]][0]))
+        Y = (int(joints[limbSeq[i][0]][1]), int(joints[limbSeq[i][1]][1]))
+        mX = np.mean(X)
+        mY = np.mean(Y)
+        length = ((X[0] - X[1]) ** 2 + (Y[0] - Y[1]) ** 2) ** 0.5
+        angle = math.degrees(math.atan2(Y[0] - Y[1], X[0] - X[1]))
+        polygon = cv2.ellipse2Poly((int(mX), int(mY)), (int(length / 2), stickwidth), int(angle), 0, 360, 1)
+        cv2.fillConvexPoly(canvas, polygon, colors[i])
 
     return canvas
 
