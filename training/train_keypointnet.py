@@ -17,7 +17,7 @@ from dataflow.keypoint_datagen import get_dataflow, batch_dataflow, COCODataPath
 
 
 batch_size = 4
-base_lr = 4e-5 # 2e-5
+base_lr = 1e-4
 momentum = 0.9
 weight_decay = 5e-4
 lr_policy =  "step"
@@ -178,11 +178,11 @@ if __name__ == '__main__':
 
     # configure callbacks
 
-    # iterations_per_epoch = train_samples // batch_size
-    # _step_decay = partial(step_decay,
-    #                       iterations_per_epoch=iterations_per_epoch
-    #                       )
-    # lrate = LearningRateScheduler(_step_decay)
+    iterations_per_epoch = train_samples // batch_size
+    _step_decay = partial(step_decay,
+                          iterations_per_epoch=iterations_per_epoch
+                          )
+    lrate = LearningRateScheduler(_step_decay)
 
     reducelr = ReduceLROnPlateau(
         monitor='val_loss',
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [checkpoint, csv_logger, tb, reducelr]
+    callbacks_list = [checkpoint, csv_logger, tb, lrate]
 
 
     opt = Adam(lr=args.lr)

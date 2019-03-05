@@ -201,7 +201,7 @@ class CocoDataFlow(RNGDataFlow):
                     # skip this person if parts number is too low or if
                     # segmentation area is too small
 
-                    if person_meta["num_keypoints"] < 5 or person_meta["area"] < 32 * 32:
+                    if person_meta["num_keypoints"] < 3 or person_meta["area"] < 16 * 16:
                         masks.append(coco.annot.annToRLE(person_meta))
                         continue
 

@@ -18,8 +18,8 @@ ALL_HEATMAP_MASK = np.repeat(
     np.ones((120, 120, 1), dtype=np.uint8), 19, axis=2)
 
 AUGMENTORS_LIST = [
-        ScaleAug(scale_min=0.5,
-                 scale_max=1.1,
+        ScaleAug(scale_min=0.8,
+                 scale_max=1.2,
                  target_dist=0.6,
                  interp=cv2.INTER_CUBIC),
 
@@ -31,7 +31,7 @@ AUGMENTORS_LIST = [
         CropAug(480, 480, center_perterb_max=40, border_value=(128, 128, 128),
                  mask_border_val=1),
 
-        FlipAug(num_parts=18, prob=0.5),
+        FlipAug(num_parts=18, prob=0.3),
     ]
 
 

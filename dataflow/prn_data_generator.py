@@ -105,7 +105,7 @@ def get_anns(coco):
     anns = []
     for i in ann_ids:
         ann = coco.loadAnns(i)[0]
-        if ann['iscrowd'] == 0 and ann['num_keypoints'] > 4:
+        if ann['iscrowd'] == 0 and ann['num_keypoints'] > 3:
             anns.append(ann) # ann
     sorted_list = sorted(anns, key=lambda k: k['num_keypoints'], reverse=True)
     return sorted_list
