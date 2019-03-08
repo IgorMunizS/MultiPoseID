@@ -201,7 +201,7 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [checkpoint, csv_logger, tb, lrate]
+    callbacks_list = [checkpoint, csv_logger, tb, reducelr]
 
 
     opt = Adam(lr=args.lr)
