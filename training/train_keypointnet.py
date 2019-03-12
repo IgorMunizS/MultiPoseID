@@ -127,7 +127,7 @@ if __name__ == '__main__':
     if args.checkpoint:
         #model = KeypointNet(18, args.backbone, False, None).model
         #model.load_weights(args.checkpoint)
-        model = load_model(args.checkpoint)
+        model = load_model(args.checkpoint, custom_objects={'eucl_loss': eucl_loss})
     else:
         model = KeypointNet(18, args.backbone, False, args.weights).model
 
