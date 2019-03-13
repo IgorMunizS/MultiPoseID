@@ -17,7 +17,7 @@ from dataflow.keypoint_datagen import get_dataflow, batch_dataflow, COCODataPath
 
 
 batch_size = 4
-base_lr = 1e-4
+base_lr = 4e-5 # 2e-5
 momentum = 0.9
 weight_decay = 5e-4
 lr_policy =  "step"
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [checkpoint, csv_logger, tb, reducelr,lrate]
+    callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
 
 
     opt = Adam(lr=args.lr)
