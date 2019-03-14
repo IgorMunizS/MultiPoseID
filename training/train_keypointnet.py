@@ -214,7 +214,7 @@ if __name__ == '__main__':
     if not args.checkpoint:
         model.compile(loss=eucl_loss, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
-                        steps_per_epoch=iterations_per_epoch,
+                        steps_per_epoch=args.steps,
                         epochs=args.epochs,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
