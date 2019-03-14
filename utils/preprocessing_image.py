@@ -18,19 +18,11 @@ def preprocess_image(x, mode='tf'):
     # except for converting RGB -> BGR since we assume BGR already
     x = x.astype(keras.backend.floatx())
     if mode == 'tf':
-        x /= 255.
-        means = [0.485, 0.456, 0.406]
-        stds = [0.229, 0.224, 0.225]
-
-        preprocessed_img = x.copy()[:, :, ::-1]
-        for i in range(3):
-            preprocessed_img[:, :, i] = preprocessed_img[:, :, i] - means[i]
-            preprocessed_img[:, :, i] = preprocessed_img[:, :, i] / stds[i]
-
-
+        x /= 127.5
+        x -= 1.
     elif mode == 'caffe':
-            x[..., 0] -= 103.939
-            x[..., 1] -= 116.779
-            x[..., 2] -= 123.68
+        x[..., 0] -= 103.939
+        x[..., 1] -= 116.779
+        x[..., 2] -= 123.68
 
-    return preprocessed_img
+    return x
