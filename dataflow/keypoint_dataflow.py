@@ -33,9 +33,7 @@ class JointsLoader:
         'Nose','Neck','RShoulder','RElbow','RWrist','LShoulder','LElbow','LWrist',
         'RHip','RKnee','RAnkle','LHip','LKnee','LAnkle','REye','LEye','REar','LEar']
 
-    joint_pairs = list(zip(
-        [1, 8, 9, 1, 11, 12, 1, 2, 3, 2, 1, 5, 6, 5, 1, 0, 0, 14, 15],
-        [8, 9, 10, 11, 12, 13, 2, 3, 4, 16, 5, 6, 7, 17, 0, 14, 15, 16, 17]))
+
 
     @staticmethod
     def from_coco_keypoints(all_keypoints, w ,h):
