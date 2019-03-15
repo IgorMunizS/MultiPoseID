@@ -1,6 +1,6 @@
 import keras.layers as KL
 from keras.models import Model
-from .backbone import Backbone
+from network.backbone import Backbone
 
 
 class KeypointNet():
@@ -11,15 +11,15 @@ class KeypointNet():
             input_image = (None, None, 3)
         else:
             input_image = (480,480,3)
-        #input_heat_mask = KL.Input(shape=(120,120,19))
+        input_heat_mask = KL.Input(shape=(120,120,19), name="mask_heat_input")
         backbone = Backbone(input_image, bck_arch, bck_weights).model
         # if bck_weights == 'imagenet':
         #     backbone.load_weights('/home/igor/PycharmProjects/MultiPoseIdentification/Models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5')
         input_graph = backbone.input
         C2,C3,C4,C5 = backbone.output
         self.fpn_part(C2,C3,C4,C5)
-        #self.apply_mask(self.D, input_heat_mask)
-        self.model = Model(inputs=[input_graph], outputs=[self.D])
+        self.apply_mask(self.D, input_heat_mask)
+        self.model = Model(inputs=[input_graph, input_heat_mask], outputs=[self.w])
         print(self.model.summary())
 
     def fpn_part(self, C2,C3,C4,C5):
@@ -65,4 +65,4 @@ class KeypointNet():
 
 
 
-# KeypointNet(17)
+# KeypointNet(18)
