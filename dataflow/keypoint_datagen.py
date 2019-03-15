@@ -190,7 +190,7 @@ def get_dataflow(coco_data_paths):
     df = MapData(df, augment)
     df = MapData(df, apply_mask)
     df = MapData(df, build_sample)
-    df = PrefetchDataZMQ(df, nr_proc=4) #df = PrefetchData(df, 2, 1)
+    df = PrefetchDataZMQ(df, nr_proc=16) #df = PrefetchData(df, 2, 1)
 
     return df
 
