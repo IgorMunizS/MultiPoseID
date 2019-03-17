@@ -60,7 +60,7 @@ def main(option):
     if not os.path.exists('checkpoint/'+option.exp):
         os.makedirs('checkpoint/'+option.exp)
 
-    model = PRN_Seperate(option.coeff*28,option.coeff*18, option.node_count)
+    model = PRN(option.coeff*28,option.coeff*18, option.node_count)
 
     adam_optimizer = keras.optimizers.Adam(lr=option.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000001)
     model.compile(loss='binary_crossentropy', optimizer=adam_optimizer)

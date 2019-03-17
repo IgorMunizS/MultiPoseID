@@ -8,6 +8,8 @@ def PRN(height, width, node_count):
     y = Flatten()(input)
     x = Dense(node_count, activation='relu')(y)
     x = Dropout(0.5)(x)
+    x = Dense(node_count, activation='relu')(x)
+    x = Dropout(0.5)(x)
     x = Dense(width * height * 18, activation='relu')(x)
     x = keras.layers.Add()([x, y])
     x = keras.layers.Activation('softmax')(x)
