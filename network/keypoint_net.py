@@ -25,7 +25,7 @@ class KeypointNet():
         if prediction:
             self.model = Model(inputs=[input_graph], outputs=[self.D])
         else:
-            self.model = Model(inputs=[input_graph], outputs=output_loss)
+            self.model = Model(inputs=[input_graph], outputs=[self.D])
         print(self.model.summary())
 
     def fpn_part(self, C2,C3,C4,C5):
