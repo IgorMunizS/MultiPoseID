@@ -32,38 +32,6 @@ logs_dir = "./logs"
 
 
 
-def get_loss_funcs():
-    """
-    Euclidean loss as implemented in caffe
-    https://github.com/BVLC/caffe/blob/master/src/caffe/layers/euclidean_loss_layer.cpp
-    :return:
-    """
-    def _eucl_loss(x, y):
-        print(x.shape, y.shape)
-        return K.sum(K.square(x - y)) / batch_size / 2
-
-    losses = {}
-    losses["Dfinal_2"] = _eucl_loss
-    #losses["weight_masked"] = _eucl_loss
-    # losses["weight_stage1_L2"] = _eucl_loss
-    # losses["weight_stage2_L1"] = _eucl_loss
-    # losses["weight_stage2_L2"] = _eucl_loss
-    # losses["weight_stage3_L1"] = _eucl_loss
-    # losses["weight_stage3_L2"] = _eucl_loss
-    # losses["weight_stage4_L1"] = _eucl_loss
-    # losses["weight_stage4_L2"] = _eucl_loss
-    # losses["weight_stage5_L1"] = _eucl_loss
-    # losses["weight_stage5_L2"] = _eucl_loss
-    # losses["weight_stage6_L1"] = _eucl_loss
-    # losses["weight_stage6_L2"] = _eucl_loss
-
-    return losses
-
-def eucl_loss(x, y):
-    l = K.sum(K.square(x - y)) / batch_size / 2
-    return l
-
-
 def step_decay(epoch, iterations_per_epoch):
     """
     Learning rate schedule - equivalent of caffe lr_policy =  "step"
@@ -124,12 +92,18 @@ if __name__ == '__main__':
     #last_epoch = restore_weights(weights_best_file, model)
     #last_epoch = restore_weights("../model/squeeze_imagenet.h5", model)
 
+
+
     if args.checkpoint:
-        #model = KeypointNet(18, args.backbone, False, None).model
-        #model.load_weights(args.checkpoint)
-        model = load_model(args.checkpoint, custom_objects={'eucl_loss': eucl_loss})
+        keypointnet = KeypointNet(18, args.backbone, False, None)
+        model = keypointnet.model
+        model.load_weights(args.checkpoint)
+
+        # model = load_model(args.checkpoint, custom_objects={'eucl_loss': eucl_loss})
     else:
-        model = KeypointNet(18, args.backbone, False, args.weights).model
+        keypointnet = KeypointNet(18, args.backbone, False, args.weights)
+        model = keypointnet.model
+
 
     print(model.summary())
 
@@ -204,15 +178,15 @@ if __name__ == '__main__':
     callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
 
 
-    opt = Adam(lr=args.lr)
+    opt = Adam(lr=args.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000001)
     # start training
     # steps_per_epoch = 5000
     print(args.steps)
     print(val_samples // batch_size)
-    loss_funcs = get_loss_funcs()
+    loss_funcs = keypointnet.keypoint_loss_function(batch_size)
 
-    if not args.checkpoint:
-        model.compile(loss=eucl_loss, optimizer=opt, metrics=["accuracy"])
+
+    model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
                         steps_per_epoch=args.steps,
                         epochs=args.epochs,

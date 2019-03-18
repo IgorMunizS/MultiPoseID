@@ -1,7 +1,7 @@
 import keras.layers as KL
 from keras.models import Model
 from network.backbone import Backbone
-
+import keras.backend as K
 
 class KeypointNet():
 
@@ -19,11 +19,18 @@ class KeypointNet():
         C2,C3,C4,C5 = backbone.output
         self.fpn_part(C2,C3,C4,C5)
         # self.apply_mask(self.D, input_heat_mask)
-        self.model = Model(inputs=[input_graph], outputs=[self.D])
+
+        output_loss = [self.D, self.k2, self.k3, self.k4, self.k5]
+
+        if prediction:
+            self.model = Model(inputs=[input_graph], outputs=[self.D])
+        else:
+            self.model = Model(inputs=[input_graph], outputs=output_loss)
         print(self.model.summary())
 
     def fpn_part(self, C2,C3,C4,C5):
 
+        ### FPN ####
         P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
         P4 = KL.Add(name="fpn_p4add")([
             KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
@@ -41,6 +48,20 @@ class KeypointNet():
         self.P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(P4)
 
         self.P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(P5)
+
+
+        ### KEYPOINT NET ####
+
+        # intermidiate supervision for loss
+
+        self.k2 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k2') (self.P2)
+        self.k3 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k3') (self.P3)
+        self.k3 = KL.UpSampling2D((2, 2), name='sup_loss_k3up')(self.k3)
+        self.k4 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(self.P4)
+        self.k4 = KL.UpSampling2D((4, 4), name='sup_loss_k4up')(self.k4)
+        self.k5 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(self.P5)
+        self.k5 = KL.UpSampling2D((8, 8), name='sup_loss_k5up')(self.k5)
+
 
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same") (self.P2)
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1_2", padding="same")(self.D2)
@@ -63,6 +84,25 @@ class KeypointNet():
 
         self.w = KL.Multiply(name=w_name)([x, mask])  # vec_heat
 
+    def keypoint_loss_function(self, batch_size):
+        """
+            Euclidean loss as implemented in caffe
+            https://github.com/BVLC/caffe/blob/master/src/caffe/layers/euclidean_loss_layer.cpp
+            :return:
+            """
+
+        def _eucl_loss(x, y):
+            print(x.shape, y.shape)
+            return K.sum(K.square(x - y)) / batch_size / 2
+
+        losses = {}
+        losses["Dfinal_2"] = _eucl_loss
+        losses["sup_loss_k2"] = _eucl_loss
+        losses["sup_loss_k3up"] = _eucl_loss
+        losses["sup_loss_k4up"] = _eucl_loss
+        losses["sup_loss_k5up"] = _eucl_loss
+
+        return losses
 
 
-# KeypointNet(18)
+KeypointNet(18)
