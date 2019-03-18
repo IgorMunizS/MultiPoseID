@@ -22,7 +22,7 @@ class Options:
     def _initial(self):
 
         # --------------------------  General Training Options
-        self.parser.add_argument('--lr', type=float, default=0.0001, help='Learning Rate')
+        self.parser.add_argument('--lr', type=float, default=0.001, help='Learning Rate')
         self.parser.add_argument('--number_of_epoch', type=int, default=20, help='Epoch')
         self.parser.add_argument('--batch_size', type=int, default=8, help='Batch Size')
         self.parser.add_argument('--node_count', type=int, default=1024, help='Hidden Layer Node Count')
@@ -65,7 +65,7 @@ def main(option):
     adam_optimizer = keras.optimizers.Adam(lr=option.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000001)
     model.compile(loss='binary_crossentropy', optimizer=adam_optimizer)
     Own_callback = My_Callback()
-    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5,patience=3)
+    reduce_lr = ReduceLROnPlateau(monitor='loss', factor=0.5,patience=2, verbose=1)
 
     model.fit_generator(generator=train_bbox_generator(coco_train, option.batch_size, option.coeff*28,option.coeff*18,option.threshold),
                         steps_per_epoch=len(get_anns(coco_train)) // option.batch_size,
