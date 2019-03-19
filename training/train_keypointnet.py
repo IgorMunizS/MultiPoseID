@@ -79,7 +79,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint', default=None)
     parser.add_argument('--batchsize', default=4, type=int)
     parser.add_argument('--epochs', default=30, type=int)
-    parser.add_argument('--steps', default=3000, type=int)
+    parser.add_argument('--steps', default=None, type=int)
     parser.add_argument('--multiprocessing', default=False, type=bool)
     parser.add_argument('--workers', default=1, type=bool)
     parser.add_argument('--lr', default=1e-4, type=float)
@@ -175,20 +175,24 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [checkpoint, csv_logger, tb, reducelr]
+    callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
 
 
     opt = Adam(lr=args.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     # start training
     # steps_per_epoch = 5000
-    print(args.steps)
+    if args.steps is None:
+        steps_per_epoch = iterations_per_epoch
+    else:
+        steps_per_epoch = args.steps
+
     print(val_samples // batch_size)
     loss_funcs = keypointnet.keypoint_loss_function(batch_size)
 
 
     model.compile(loss=loss_funcs, optimizer=opt, metrics=["accuracy"])
     model.fit_generator(train_gen,
-                        steps_per_epoch=args.steps,
+                        steps_per_epoch=steps_per_epoch,
                         epochs=args.epochs,
                         callbacks=callbacks_list,
                         validation_data=val_gen,
