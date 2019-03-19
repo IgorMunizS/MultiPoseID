@@ -105,4 +105,4 @@ class KeypointNet():
         return losses
 
 
-KeypointNet(18)
+# KeypointNet(18)

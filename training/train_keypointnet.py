@@ -105,7 +105,7 @@ if __name__ == '__main__':
         model = keypointnet.model
 
 
-    print(model.summary())
+    # print(model.summary())
 
     # prepare generators
 
