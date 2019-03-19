@@ -161,7 +161,7 @@ if __name__ == '__main__':
     reducelr = ReduceLROnPlateau(
         monitor='val_loss',
         factor=0.1,
-        patience=2,
+        patience=3,
         verbose=1,
         mode='auto',
         epsilon=0.0001,
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
+    callbacks_list = [checkpoint, csv_logger, tb, reducelr]
 
 
     opt = Adam(lr=args.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000001)
