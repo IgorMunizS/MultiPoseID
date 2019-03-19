@@ -159,7 +159,7 @@ if __name__ == '__main__':
     lrate = LearningRateScheduler(_step_decay)
 
     reducelr = ReduceLROnPlateau(
-        monitor='val_loss',
+        monitor='loss',
         factor=0.1,
         patience=3,
         verbose=1,
