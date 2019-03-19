@@ -178,7 +178,7 @@ if __name__ == '__main__':
     callbacks_list = [checkpoint, csv_logger, tb, reducelr]
 
 
-    opt = Adam(lr=args.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.000001)
+    opt = Adam(lr=args.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     # start training
     # steps_per_epoch = 5000
     print(args.steps)
