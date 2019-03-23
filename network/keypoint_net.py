@@ -102,16 +102,19 @@ class KeypointNet():
                 """
         resnet_filename = 'ResNet-{}-model.keras.h5'
         resnet_resource = 'https://github.com/fizyr/keras-models/releases/download/v0.0.1/{}'.format(resnet_filename)
-
+        if bck == 'resnet50':
+            checksum = '3e9f4e4f77bbe2c9bec13b53ee1c2319'
+            depth = 50
+        elif bck == 'resnet101':
+            checksum = '05dc86924389e5b401a9ea0348a3213c'
+            depth = 101
+        elif bck == 'resnet152':
+            checksum = '6ee11ef2b135592f8031058820bb9e71'
+            depth = 152
 
         filename = resnet_filename.format(depth)
         resource = resnet_resource.format(depth)
-        if bck == 'resnet50':
-            checksum = '3e9f4e4f77bbe2c9bec13b53ee1c2319'
-        elif bck == 'resnet101':
-            checksum = '05dc86924389e5b401a9ea0348a3213c'
-        elif bck == 'resnet152':
-            checksum = '6ee11ef2b135592f8031058820bb9e71'
+
 
         return get_file(
             filename,
