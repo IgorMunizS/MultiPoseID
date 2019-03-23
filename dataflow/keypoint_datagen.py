@@ -172,7 +172,7 @@ def build_sample(components):
     meta.img = None
     meta.aug_joints = None
     meta.aug_center = None
-    image = preprocess_image(image.astype(np.float32), mode='tf')
+    image = preprocess_image(image.astype(np.float32))
 
     return [image, mask_heatmap, heatmap]
 

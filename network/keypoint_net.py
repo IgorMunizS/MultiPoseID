@@ -2,22 +2,31 @@ import keras.layers as KL
 from keras.models import Model
 from network.backbone import Backbone
 import keras.backend as K
+import keras_resnet
+import keras_resnet.models
+from keras.utils import get_file
 
 class KeypointNet():
 
     def __init__(self, nb_keypoints, bck_arch = 'resnet50', prediction = False, bck_weights=None):
         self.nb_keypoints = nb_keypoints + 1 # K + 1(mask)
         if prediction:
-            input_image = (None, None, 3)
+            input_image = KL.Input(shape=(None, None, 3), name='inputs')
         else:
-            input_image = (480,480,3)
+            input_image = KL.Input(shape=(480, 480, 3), name='inputs')
         # input_heat_mask = KL.Input(shape=(120,120,19), name="mask_heat_input")
-        backbone = Backbone(input_image, bck_arch, bck_weights).model
-        # if bck_weights == 'imagenet':
-        #     backbone.load_weights('/home/igor/PycharmProjects/MultiPoseIdentification/Models/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5')
+        # backbone = Backbone(input_image, bck_arch, bck_weights).model
+        if bck_arch == 'resnet50':
+            backbone = keras_resnet.models.FPN2D50(input_image)
+
+        if bck_arch == 'resnet101':
+            backbone = keras_resnet.models.FPN2D101(input_image)
+
+
+
         input_graph = backbone.input
-        C2,C3,C4,C5 = backbone.output
-        self.fpn_part(C2,C3,C4,C5)
+        P2,P3,P4,P5, _ = backbone.output
+        self.keypoint_net(P2,P3,P4,P5)
         # self.apply_mask(self.D, input_heat_mask)
 
         output_loss = [self.D, self.k2, self.k3, self.k4, self.k5]
@@ -26,21 +35,30 @@ class KeypointNet():
             self.model = Model(inputs=[input_graph], outputs=[self.D])
         else:
             self.model = Model(inputs=[input_graph], outputs=output_loss)
+
+        if bck_weights is not None:
+            if bck_weights == 'imagenet':
+                weights = self.download_weights(bck_arch)
+                self.model.load_weights(weights, by_name=True, skip_mismatch=True)
+            else:
+                self.model.load_weights(bck_weights, by_name=True, skip_mismatch=True)
+
+
         print(self.model.summary())
 
-    def fpn_part(self, C2,C3,C4,C5):
+    def keypoint_net(self, P2,P3,P4,P5):
 
-        ### FPN ####
-        P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
-        P4 = KL.Add(name="fpn_p4add")([
-            KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
-            KL.Conv2D(256, (1, 1), name='fpn_c4p4')(C4)])
-        P3 = KL.Add(name="fpn_p3add")([
-            KL.UpSampling2D(size=(2, 2), name="fpn_p4upsampled")(P4),
-            KL.Conv2D(256, (1, 1), name='fpn_c3p3')(C3)])
-        P2 = KL.Add(name="fpn_p2add")([
-            KL.UpSampling2D(size=(2, 2), name="fpn_p3upsampled")(P3),
-            KL.Conv2D(256, (1, 1), name='fpn_c2p2')(C2)])
+        # ### FPN ####
+        # P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
+        # P4 = KL.Add(name="fpn_p4add")([
+        #     KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
+        #     KL.Conv2D(256, (1, 1), name='fpn_c4p4')(C4)])
+        # P3 = KL.Add(name="fpn_p3add")([
+        #     KL.UpSampling2D(size=(2, 2), name="fpn_p4upsampled")(P4),
+        #     KL.Conv2D(256, (1, 1), name='fpn_c3p3')(C3)])
+        # P2 = KL.Add(name="fpn_p2add")([
+        #     KL.UpSampling2D(size=(2, 2), name="fpn_p3upsampled")(P3),
+        #     KL.Conv2D(256, (1, 1), name='fpn_c2p2')(C2)])
 
         # Attach 3x3 conv to all P layers to get the final feature maps.
         self.P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(P2)
@@ -79,10 +97,28 @@ class KeypointNet():
         self.D = KL.Conv2D(512, (3, 3), activation="relu", padding="SAME", name="Dfinal_1")(self.concat)
         self.D = KL.Conv2D(self.nb_keypoints, (1, 1), padding="SAME", name="Dfinal_2")(self.D)
 
-    def apply_mask(self, x, mask):
-        w_name = "weight_masked"
+    def download_weights(self, bck):
+        """ Downloads ImageNet weights and returns path to weights file.
+                """
+        resnet_filename = 'ResNet-{}-model.keras.h5'
+        resnet_resource = 'https://github.com/fizyr/keras-models/releases/download/v0.0.1/{}'.format(resnet_filename)
 
-        self.w = KL.Multiply(name=w_name)([x, mask])  # vec_heat
+
+        filename = resnet_filename.format(depth)
+        resource = resnet_resource.format(depth)
+        if bck == 'resnet50':
+            checksum = '3e9f4e4f77bbe2c9bec13b53ee1c2319'
+        elif bck == 'resnet101':
+            checksum = '05dc86924389e5b401a9ea0348a3213c'
+        elif bck == 'resnet152':
+            checksum = '6ee11ef2b135592f8031058820bb9e71'
+
+        return get_file(
+            filename,
+            resource,
+            cache_subdir='models',
+            md5_hash=checksum
+        )
 
     def keypoint_loss_function(self, batch_size):
         """

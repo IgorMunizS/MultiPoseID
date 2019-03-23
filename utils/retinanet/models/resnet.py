@@ -19,7 +19,8 @@ from network import resnet as resnets
 from network import retinanet
 from . import Backbone
 from utils.preprocessing_image import preprocess_image
-
+import keras_resnet
+import keras_resnet.models
 
 class ResNetBackbone(Backbone):
     """ Describes backbone information and provides utility functions.
@@ -27,7 +28,7 @@ class ResNetBackbone(Backbone):
 
     def __init__(self, backbone):
         super(ResNetBackbone, self).__init__(backbone)
-        #self.custom_objects.update(keras_resnet.custom_objects)
+        self.custom_objects.update(keras_resnet.custom_objects)
 
     def retinanet(self, *args, **kwargs):
         """ Returns a retinanet model using the correct backbone.
@@ -60,7 +61,7 @@ class ResNetBackbone(Backbone):
     def validate(self):
         """ Checks whether the backbone string is correct.
         """
-        allowed_backbones = ['resnet50', 'resnet101', 'resnetx50', 'resnetx101']
+        allowed_backbones = ['resnet50', 'resnet101', 'resnet152']
         backbone = self.backbone.split('_')[0]
 
         if backbone not in allowed_backbones:
@@ -69,15 +70,14 @@ class ResNetBackbone(Backbone):
     def preprocess_image(self, inputs):
         """ Takes as input an image and prepares it for being passed through the network.
         """
-        return preprocess_image(inputs, mode='tf')
-        #return inputs
+        return preprocess_image(inputs, mode='caffe')
 
 
 def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=None, **kwargs):
     """ Constructs a retinanet model using a resnet backbone.
     Args
         num_classes: Number of classes to predict.
-        backbone: Which backbone to use (one of ('resnet50', 'resnet101', 'resnetx50', 'resnetx101')).
+        backbone: Which backbone to use (one of ('resnet50', 'resnet101', 'resnet152')).
         inputs: The inputs to the network (defaults to a Tensor of shape (None, None, 3)).
         modifier: A function handler which can modify the backbone before using it in retinanet (this can be used to freeze backbone layers for example).
     Returns
@@ -92,14 +92,11 @@ def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=Non
 
     # create the resnet backbone
     if backbone == 'resnet50':
-        resnet = resnets.ResNet50(include_top=False, weights=None, input_tensor=inputs)
+        resnet = keras_resnet.models.ResNet50(inputs, include_top=False, freeze_bn=True)
     elif backbone == 'resnet101':
-        resnet = resnets.ResNet101(include_top=False, weights=None, input_tensor=inputs)
-    elif backbone == 'resnetx50':
-        resnet = resnets.ResNeXt50(include_top=False, weights=None, input_tensor=inputs)
-
-    elif backbone == 'resnetx101':
-        resnet = resnets.ResNeXt101(include_top=False, weights=None, input_tensor=inputs)
+        resnet = keras_resnet.models.ResNet101(inputs, include_top=False, freeze_bn=True)
+    elif backbone == 'resnet152':
+        resnet = keras_resnet.models.ResNet152(inputs, include_top=False, freeze_bn=True)
     else:
         raise ValueError('Backbone (\'{}\') is invalid.'.format(backbone))
 
@@ -119,8 +116,5 @@ def resnet101_retinanet(num_classes, inputs=None, **kwargs):
     return resnet_retinanet(num_classes=num_classes, backbone='resnet101', inputs=inputs, **kwargs)
 
 
-def resnetx50_retinanet(num_classes, inputs=None, **kwargs):
-    return resnet_retinanet(num_classes=num_classes, backbone='resnetx50', inputs=inputs, **kwargs)
-
-def resnetx101_retinanet(num_classes, inputs=None, **kwargs):
-    return resnet_retinanet(num_classes=num_classes, backbone='resnetx101', inputs=inputs, **kwargs)
+def resnet152_retinanet(num_classes, inputs=None, **kwargs):
+    return resnet_retinanet(num_classes=num_classes, backbone='resnet152', inputs=inputs, **kwargs)
