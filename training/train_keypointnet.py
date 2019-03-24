@@ -60,7 +60,8 @@ if __name__ == '__main__':
     parser.add_argument('--steps', default=None, type=int)
     parser.add_argument('--multiprocessing', default=False, type=bool)
     parser.add_argument('--workers', default=1, type=bool)
-    parser.add_argument('--lr', default=1e-4, type=float)
+    parser.add_argument('--lr', default=4e-5, type=float)
+    parser.add_argument('--initialepoch', default=0, type=int)
     args = parser.parse_args()
 
 
@@ -173,4 +174,4 @@ if __name__ == '__main__':
                         validation_steps=val_samples // batch_size,
                         use_multiprocessing=args.multiprocessing,
                         workers = args.workers,
-                        initial_epoch=0)
+                        initial_epoch=args.initialepoch)
