@@ -16,23 +16,15 @@ from network.keypoint_net import KeypointNet
 from dataflow.keypoint_datagen import get_dataflow, batch_dataflow, COCODataPaths
 
 
-batch_size = 4
-base_lr = 4e-5 # 2e-5
-momentum = 0.9
-weight_decay = 5e-4
-lr_policy =  "step"
 gamma = 0.333
 stepsize = 136106 #68053   // after each stepsize iterations update learning rate: lr=lr*gamma
-max_iter = 60000 # 600000
-steps_per_epoch = 3000
 
-weights_best_file = "weights.best.h5"
 training_log = "training.csv"
 logs_dir = "./logs"
 
 
 
-def step_decay(epoch, iterations_per_epoch):
+def step_decay(epoch, base_lr, iterations_per_epoch):
     """
     Learning rate schedule - equivalent of caffe lr_policy =  "step"
 
@@ -44,7 +36,7 @@ def step_decay(epoch, iterations_per_epoch):
     steps = epoch * iterations_per_epoch
 
     lrate = initial_lrate * math.pow(gamma, math.floor(steps/stepsize))
-
+    print("Lr update: ",lrate)
     return lrate
 
 
@@ -57,24 +49,10 @@ def gen(df):
         for i in df.get_data():
             yield i
 
-def get_imagenet_weights():
-    """Downloads ImageNet trained weights from Keras.
-    Returns path to weights file.
-    """
-    from keras.utils.data_utils import get_file
-    TF_WEIGHTS_PATH_NO_TOP = 'https://github.com/fchollet/deep-learning-models/' \
-                             'releases/download/v0.2/' \
-                             'resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5'
-    weights_path = get_file('resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5',
-                            TF_WEIGHTS_PATH_NO_TOP,
-                            cache_subdir='models',
-                            md5_hash='a268eb855778b3df3c7506639542a6af')
-    return weights_path
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Training codes for Keras Pose Estimation')
     parser.add_argument('--backbone', default=None, help='backbone model name')
-    parser.add_argument('--ambient', default='desktop', help='local training')
     parser.add_argument('--weights', default='imagenet')
     parser.add_argument('--checkpoint', default=None)
     parser.add_argument('--batchsize', default=4, type=int)
@@ -110,16 +88,11 @@ if __name__ == '__main__':
     # prepare generators
 
     curr_dir = os.path.dirname(__file__)
-    if args.ambient == "colab":
-        annot_path = os.path.join(curr_dir, 'data/annotations/person_keypoints_train2017.json')
-        img_dir = os.path.abspath(os.path.join(curr_dir, 'data/train2017/'))
-        annot_path_val = os.path.join(curr_dir, 'data/annotations/person_keypoints_val2017.json')
-        img_dir_val = os.path.abspath(os.path.join(curr_dir, 'data/val2017/'))
-    else:
-        annot_path = ('/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json')
-        img_dir = ('/home/igor/Pesquisa/Datasets/COCO/images/val2017/')
-        annot_path_val = ('/home/igor/Pesquisa/Datasets/COCO/annotations/person_keypoints_val2017.json')
-        img_dir_val = ('/home/igor/Pesquisa/Datasets/COCO/images/val2017/')
+    annot_path = os.path.join(curr_dir, 'data/annotations/person_keypoints_train2017.json')
+    img_dir = os.path.abspath(os.path.join(curr_dir, 'data/train2017/'))
+    annot_path_val = os.path.join(curr_dir, 'data/annotations/person_keypoints_val2017.json')
+    img_dir_val = os.path.abspath(os.path.join(curr_dir, 'data/val2017/'))
+
 
     # get dataflow of samples
     coco_data_train = COCODataPaths(
@@ -154,6 +127,7 @@ if __name__ == '__main__':
 
     iterations_per_epoch = train_samples // batch_size
     _step_decay = partial(step_decay,
+                          base_lr=args.lr,
                           iterations_per_epoch=iterations_per_epoch
                           )
     lrate = LearningRateScheduler(_step_decay)
