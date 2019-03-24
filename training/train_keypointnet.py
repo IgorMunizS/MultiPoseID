@@ -173,5 +173,5 @@ if __name__ == '__main__':
                         validation_data=val_gen,
                         validation_steps=val_samples // batch_size,
                         use_multiprocessing=args.multiprocessing,
-                        workers = args.workers,
-                        initial_epoch=args.initialepoch)
+                        workers=args.workers,
+                        initial_epoch=(args.initialepoch - 1))
