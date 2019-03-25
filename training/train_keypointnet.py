@@ -61,7 +61,7 @@ if __name__ == '__main__':
     parser.add_argument('--multiprocessing', default=False, type=bool)
     parser.add_argument('--workers', default=1, type=bool)
     parser.add_argument('--lr', default=4e-5, type=float)
-    parser.add_argument('--initialepoch', default=0, type=int)
+    parser.add_argument('--initialepoch', default=1, type=int)
     args = parser.parse_args()
 
 
