@@ -62,6 +62,7 @@ if __name__ == '__main__':
     parser.add_argument('--workers', default=1, type=bool)
     parser.add_argument('--lr', default=4e-5, type=float)
     parser.add_argument('--initialepoch', default=1, type=int)
+    parser.add_argument('--lrschedule', default=True, type=bool)
     args = parser.parse_args()
 
 
@@ -150,7 +151,10 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    callbacks_list = [lrate, checkpoint, csv_logger, tb, reducelr]
+    if args.lrschedule:
+        callbacks_list = [lrate, checkpoint, csv_logger, tb]
+    else:
+        callbacks_list = [reducelr, checkpoint, csv_logger, tb]
 
 
     opt = Adam(lr=args.lr, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)

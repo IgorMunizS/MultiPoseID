@@ -61,37 +61,39 @@ class KeypointNet():
         #     KL.Conv2D(256, (1, 1), name='fpn_c2p2')(C2)])
 
         # Attach 3x3 conv to all P layers to get the final feature maps.
-        self.P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(P2)
-        self.P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(P3)
-        self.P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(P4)
-
-        self.P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(P5)
+        # self.P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(P2)
+        # self.P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(P3)
+        # self.P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(P4)
+        #
+        # self.P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(P5)
 
 
         ### KEYPOINT NET ####
 
         # intermidiate supervision for loss
 
-        self.k2 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k2') (self.P2)
-        self.k3 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k3') (self.P3)
+        self.k2 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k2') (P2)
+        self.k3 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k3') (P3)
         self.k3 = KL.UpSampling2D((2, 2), name='sup_loss_k3up')(self.k3)
-        self.k4 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(self.P4)
+        self.k4 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(P4)
         self.k4 = KL.UpSampling2D((4, 4), name='sup_loss_k4up')(self.k4)
-        self.k5 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(self.P5)
+        self.k5 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(P5)
         self.k5 = KL.UpSampling2D((8, 8), name='sup_loss_k5up')(self.k5)
 
 
-        self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same") (self.P2)
+        self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same") (P2)
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1_2", padding="same")(self.D2)
-        self.D3 = KL.Conv2D(128, (3, 3), name="d3_1", padding="same")(self.P3)
+        self.D3 = KL.Conv2D(128, (3, 3), name="d3_1", padding="same")(P3)
         self.D3 = KL.Conv2D(128, (3, 3), name="d3_1_2", padding="same")(self.D3)
-        self.D3 = KL.UpSampling2D((2, 2), )(self.D3)
-        self.D4 = KL.Conv2D(128, (3, 3), name="d4_1", padding="same")(self.P4)
+        self.D4 = KL.Conv2D(128, (3, 3), name="d4_1", padding="same")(P4)
         self.D4 = KL.Conv2D(128, (3, 3), name="d4_1_2", padding="same")(self.D4)
-        self.D4 = KL.UpSampling2D((4, 4))(self.D4)
-        self.D5 = KL.Conv2D(128, (3, 3), name="d5_1", padding="same")(self.P5)
+        self.D5 = KL.Conv2D(128, (3, 3), name="d5_1", padding="same")(P5)
         self.D5 = KL.Conv2D(128, (3, 3), name="d5_1_2", padding="same")(self.D5)
+
+        self.D3 = KL.UpSampling2D((2, 2), )(self.D3)
+        self.D4 = KL.UpSampling2D((4, 4))(self.D4)
         self.D5 = KL.UpSampling2D((8, 8))(self.D5)
+
 
         self.concat = KL.concatenate([self.D2, self.D3, self.D4, self.D5], axis=-1)
         self.D = KL.Conv2D(512, (3, 3), activation="relu", padding="SAME", name="Dfinal_1")(self.concat)

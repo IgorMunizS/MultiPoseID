@@ -11,39 +11,120 @@ import cv2
 from network.retinanet import *
 from network.prn_network import *
 import keras.backend as K
-
+import keras_resnet.models
 
 class PoseCNet():
 
     def __init__(self, bck_arch="resnet50", nb_keypoints = 18):
         self.nb_keypoints = nb_keypoints + 1  # K + 1(mask)
-        input_image = (None,None,3)
+        input_image = KL.Input(shape=(None, None, 3), name='inputs')
         height = 56
         width = 36
         node_count = 1024
 
         #Backbone (resnet50/101/x50/x101)
-        self.backbone = Backbone(input_image, bck_arch)
-        C2, C3, C4, C5 = self.backbone.model.output
+        if bck_arch == 'resnet50':
+            backbone = keras_resnet.models.ResNet2D50(input_image, include_top=False, freeze_bn=True)
 
-        #Keypoint net part
-        P5 = KL.Conv2D(256, (1, 1), name='fpn_c5p5')(C5)
-        P4 = KL.Add(name="fpn_p4add")([
-            KL.UpSampling2D(size=(2, 2), name="fpn_p5upsampled")(P5),
-            KL.Conv2D(256, (1, 1), name='fpn_c4p4')(C4)])
-        P3 = KL.Add(name="fpn_p3add")([
-            KL.UpSampling2D(size=(2, 2), name="fpn_p4upsampled")(P4),
-            KL.Conv2D(256, (1, 1), name='fpn_c3p3')(C3)])
-        P2 = KL.Add(name="fpn_p2add")([
-            KL.UpSampling2D(size=(2, 2), name="fpn_p3upsampled")(P3),
-            KL.Conv2D(256, (1, 1), name='fpn_c2p2')(C2)])
+        if bck_arch == 'resnet101':
+            backbone = keras_resnet.models.ResNet2D101(input_image, include_top=False, freeze_bn=True)
+
+        input_graph = backbone.input
+        c2,c3,c4,c5 = backbone.output
+
+        pyramid_5 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=1,
+            strides=1,
+            padding="same",
+            name="c5_reduced"
+        )(c5)
+
+        upsampled_p5 = keras.layers.UpSampling2D(
+            interpolation="bilinear",
+            name="p5_upsampled",
+            size=(2, 2)
+        )(pyramid_5)
+
+        pyramid_4 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=1,
+            strides=1,
+            padding="same",
+            name="c4_reduced"
+        )(c4)
+
+        pyramid_4 = keras.layers.Add(
+            name="p4_merged"
+        )([upsampled_p5, pyramid_4])
+
+        upsampled_p4 = keras.layers.UpSampling2D(
+            interpolation="bilinear",
+            name="p4_upsampled",
+            size=(2, 2)
+        )(pyramid_4)
+
+        pyramid_4 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=3,
+            strides=1,
+            padding="same",
+            name="p4"
+        )(pyramid_4)
+
+        pyramid_3 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=1,
+            strides=1,
+            padding="same",
+            name="c3_reduced"
+        )(c3)
+
+        pyramid_3 = keras.layers.Add(
+            name="p3_merged"
+        )([upsampled_p4, pyramid_3])
+
+        upsampled_p3 = keras.layers.UpSampling2D(
+            interpolation="bilinear",
+            name="p3_upsampled",
+            size=(2, 2)
+        )(pyramid_3)
+
+        pyramid_3 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=3,
+            strides=1,
+            padding="same",
+            name="p3"
+        )(pyramid_3)
+
+        pyramid_2 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=1,
+            strides=1,
+            padding="same",
+            name="c2_reduced"
+        )(c2)
+
+        pyramid_2 = keras.layers.Add(
+            name="p2_merged"
+        )([upsampled_p3, pyramid_2])
+
+        pyramid_2 = keras.layers.Conv2D(
+            filters=256,
+            kernel_size=3,
+            strides=1,
+            padding="same",
+            name="p2"
+        )(pyramid_2)
+
 
         # Attach 3x3 conv to all P layers to get the final feature maps.
-        self.P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(P2)
-        self.P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(P3)
-        self.P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(P4)
+        self.P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(pyramid_2)
+        self.P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(pyramid_3)
+        self.P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(pyramid_4)
 
-        self.P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(P5)
+        self.P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(pyramid_5)
 
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same")(self.P2)
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1_2", padding="same")(self.D2)
@@ -64,7 +145,7 @@ class PoseCNet():
 
         #DetectionNet part (RetinaNet)
 
-        retina_net = retinanet(self.backbone.model.input, [C3, C4, C5], 1)
+        retina_net = retinanet(input_graph, [c3,c4,c5], 1)
         retina_bbox = retinanet_bbox(retina_net)
         self.detection_output = retina_bbox.output
 
@@ -100,7 +181,7 @@ class PoseCNet():
         output = [self.keypoint_output]
         output.extend(self.detection_output)
        # output.append(self.prn_output)
-        self.model = Model(inputs=self.backbone.model.input, outputs=output)
+        self.model = Model(inputs=input_graph, outputs=output)
         print(self.model.summary())
 
     def load_subnet_weights(self, k_weights, d_weights):
