@@ -151,9 +151,11 @@ if __name__ == '__main__':
     tb = TensorBoard(log_dir=logs_dir, histogram_freq=0, write_graph=True,
                      write_images=False)
 
-    if args.lrschedule:
+    if args.lrschedule is True:
+        print("-- Learning Rate Schedule --")
         callbacks_list = [lrate, checkpoint, csv_logger, tb]
     else:
+        print("-- Learning Rate On Plateau")
         callbacks_list = [reducelr, checkpoint, csv_logger, tb]
 
 
