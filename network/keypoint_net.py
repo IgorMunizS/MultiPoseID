@@ -9,7 +9,7 @@ from keras.utils import get_file
 class KeypointNet():
 
     def __init__(self, nb_keypoints, bck_arch = 'resnet50', prediction = False, bck_weights=None):
-        self.nb_keypoints = nb_keypoints + 1 # K + 1(mask)
+        self.nb_keypoints = nb_keypoints # K + 1(mask)
         if prediction:
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
         else:
@@ -72,12 +72,12 @@ class KeypointNet():
 
         # intermidiate supervision for loss
 
-        self.k2 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k2') (P2)
-        self.k3 = KL.Conv2D(19, (1,1), strides=1, padding="valid", name='sup_loss_k3') (P3)
+        self.k2 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k2') (P2)
+        self.k3 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k3') (P3)
         self.k3 = KL.UpSampling2D((2, 2), name='sup_loss_k3up')(self.k3)
-        self.k4 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(P4)
+        self.k4 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(P4)
         self.k4 = KL.UpSampling2D((4, 4), name='sup_loss_k4up')(self.k4)
-        self.k5 = KL.Conv2D(19, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(P5)
+        self.k5 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(P5)
         self.k5 = KL.UpSampling2D((8, 8), name='sup_loss_k5up')(self.k5)
 
 
@@ -90,9 +90,9 @@ class KeypointNet():
         self.D5 = KL.Conv2D(128, (3, 3), name="d5_1", padding="same")(P5)
         self.D5 = KL.Conv2D(128, (3, 3), name="d5_1_2", padding="same")(self.D5)
 
-        self.D3 = KL.UpSampling2D((2, 2), )(self.D3)
-        self.D4 = KL.UpSampling2D((4, 4))(self.D4)
-        self.D5 = KL.UpSampling2D((8, 8))(self.D5)
+        self.D3 = KL.UpSampling2D((2, 2), name='d3_up')(self.D3)
+        self.D4 = KL.UpSampling2D((4, 4), name='d4_up')(self.D4)
+        self.D5 = KL.UpSampling2D((8, 8), name='d5_up')(self.D5)
 
 
         self.concat = KL.concatenate([self.D2, self.D3, self.D4, self.D5], axis=-1)
@@ -134,7 +134,7 @@ class KeypointNet():
 
         def _eucl_loss(x, y):
             print(x.shape, y.shape)
-            return K.sum(K.square(x - y)) / batch_size / 2
+            return (K.sum(K.square(x - y)) / 2) / batch_size
 
         losses = {}
         losses["Dfinal_2"] = _eucl_loss
