@@ -134,7 +134,7 @@ class KeypointNet():
 
         def _eucl_loss(x, y):
             print(x.shape, y.shape)
-            return (K.sum(K.square(x - y)) / 2) / batch_size
+            return K.sum(K.square(x - y)) / batch_size / 2
 
         losses = {}
         losses["Dfinal_2"] = _eucl_loss
