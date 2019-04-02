@@ -15,7 +15,7 @@ from dataflow.keypoint_dataflow  import CocoDataFlow, JointsLoader, COCODataPath
 from utils.preprocessing_image import preprocess_image
 
 ALL_HEATMAP_MASK = np.repeat(
-    np.ones((120, 120, 1), dtype=np.uint8), 19, axis=2)
+    np.ones((120, 120, 1), dtype=np.uint8), 18, axis=2)
 
 AUGMENTORS_LIST = [
         ScaleAug(scale_min=0.8,
@@ -161,9 +161,9 @@ def build_sample(components):
     else:
         #print(meta.mask.shape)
 
-        mask_heatmap = create_all_mask(meta.mask, 19, stride=4)
+        mask_heatmap = create_all_mask(meta.mask, 18, stride=4)
 
-    heatmap = create_heatmap(JointsLoader.num_joints_and_bkg, 120, 120,
+    heatmap = create_heatmap(JointsLoader.num_joints, 120, 120,
                              meta.aug_joints, 7.0, stride=4)
 
     # image = preprocess_image(image)
@@ -174,7 +174,7 @@ def build_sample(components):
     meta.aug_center = None
     # image = preprocess_image(image)
 
-    return [image, mask_heatmap, heatmap]
+    return [image.astype(np.uint8), mask_heatmap, heatmap]
 
 
 def get_dataflow(coco_data_paths):

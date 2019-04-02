@@ -9,7 +9,7 @@ from keras.utils import get_file
 class KeypointNet():
 
     def __init__(self, nb_keypoints, bck_arch = 'resnet50', prediction = False, bck_weights=None):
-        self.nb_keypoints = nb_keypoints + 1 # K + 1(mask)
+        self.nb_keypoints = nb_keypoints# K + 1(mask)
         if prediction:
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
         else:
@@ -34,7 +34,7 @@ class KeypointNet():
         if prediction:
             self.model = Model(inputs=[input_graph], outputs=[self.D])
         else:
-            self.model = Model(inputs=[input_graph], outputs=output_loss)
+            self.model = Model(inputs=[input_graph], outputs=[self.D])
 
         if bck_weights is not None:
             if bck_weights == 'imagenet':
@@ -97,7 +97,7 @@ class KeypointNet():
 
         self.concat = KL.concatenate([self.D2, self.D3, self.D4, self.D5], axis=-1)
         self.D = KL.Conv2D(512, (3, 3), activation="relu", padding="SAME", name="Dfinal_1")(self.concat)
-        self.D = KL.Conv2D(self.nb_keypoints, (1, 1), padding="SAME", name="Dfinal_2")(self.D)
+        self.D = KL.Conv2D(self.nb_keypoints, (1, 1), padding="valid", name="Dfinal_2")(self.D)
 
     def download_weights(self, bck):
         """ Downloads ImageNet weights and returns path to weights file.
