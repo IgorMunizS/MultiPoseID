@@ -72,13 +72,13 @@ class KeypointNet():
 
         # intermidiate supervision for loss
 
-        self.k2 = KL.Conv2D(self.nb_keypoints +1, (1,1), strides=1, padding="valid", name='sup_loss_k2') (P2)
+        self.k2 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k2') (P2)
         self.k3 = KL.UpSampling2D((2, 2), name='sup_loss_k3up')(P3)
-        self.k3 = KL.Conv2D(self.nb_keypoints +1, (1,1), strides=1, padding="valid", name='sup_loss_k3') (self.k3)
+        self.k3 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k3') (self.k3)
         self.k4 = KL.UpSampling2D((4, 4), name='sup_loss_k4up')(P4)
-        self.k4 = KL.Conv2D(self.nb_keypoints +1, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(self.k4)
+        self.k4 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(self.k4)
         self.k5 = KL.UpSampling2D((8, 8), name='sup_loss_k5up')(P5)
-        self.k5 = KL.Conv2D(self.nb_keypoints +1, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(self.k5)
+        self.k5 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(self.k5)
 
 
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same") (P2)
