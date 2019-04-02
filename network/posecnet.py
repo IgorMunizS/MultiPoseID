@@ -16,7 +16,7 @@ import keras_resnet.models
 class PoseCNet():
 
     def __init__(self, bck_arch="resnet50", nb_keypoints = 18):
-        self.nb_keypoints = nb_keypoints + 1  # K + 1(mask)
+        self.nb_keypoints = nb_keypoints  # K + 1(mask)
         input_image = KL.Input(shape=(None, None, 3), name='inputs')
         height = 56
         width = 36
@@ -119,24 +119,18 @@ class PoseCNet():
         )(pyramid_2)
 
 
-        # Attach 3x3 conv to all P layers to get the final feature maps.
-        self.P2 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p2")(pyramid_2)
-        self.P3 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p3")(pyramid_3)
-        self.P4 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p4")(pyramid_4)
-
-        self.P5 = KL.Conv2D(256, (3, 3), padding="SAME", name="fpn_p5")(pyramid_5)
-
-        self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same")(self.P2)
+        self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same")(pyramid_2)
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1_2", padding="same")(self.D2)
-        self.D3 = KL.Conv2D(128, (3, 3), name="d3_1", padding="same")(self.P3)
+        self.D3 = KL.Conv2D(128, (3, 3), name="d3_1", padding="same")(pyramid_3)
         self.D3 = KL.Conv2D(128, (3, 3), name="d3_1_2", padding="same")(self.D3)
-        self.D3 = KL.UpSampling2D((2, 2), )(self.D3)
-        self.D4 = KL.Conv2D(128, (3, 3), name="d4_1", padding="same")(self.P4)
+        self.D4 = KL.Conv2D(128, (3, 3), name="d4_1", padding="same")(pyramid_4)
         self.D4 = KL.Conv2D(128, (3, 3), name="d4_1_2", padding="same")(self.D4)
-        self.D4 = KL.UpSampling2D((4, 4))(self.D4)
-        self.D5 = KL.Conv2D(128, (3, 3), name="d5_1", padding="same")(self.P5)
+        self.D5 = KL.Conv2D(128, (3, 3), name="d5_1", padding="same")(pyramid_5)
         self.D5 = KL.Conv2D(128, (3, 3), name="d5_1_2", padding="same")(self.D5)
-        self.D5 = KL.UpSampling2D((8, 8))(self.D5)
+
+        self.D3 = KL.UpSampling2D((2, 2), name='d3_up')(self.D3)
+        self.D4 = KL.UpSampling2D((4, 4), name='d4_up')(self.D4)
+        self.D5 = KL.UpSampling2D((8, 8), name='d5_up')(self.D5)
 
         self.concat = KL.concatenate([self.D2, self.D3, self.D4, self.D5], axis=-1)
         self.D = KL.Conv2D(512, (3, 3), activation="relu", padding="SAME", name="Dfinal_1")(self.concat)

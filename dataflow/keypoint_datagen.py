@@ -26,9 +26,9 @@ AUGMENTORS_LIST = [
         RotateAug(rotate_max_deg=40,
                   interp=cv2.INTER_CUBIC,
                   border=cv2.BORDER_CONSTANT,
-                  border_value=(128, 128, 128), mask_border_val=1),
+                  border_value=(0, 0, 0), mask_border_val=1),
 
-        CropAug(480, 480, center_perterb_max=40, border_value=(128, 128, 128),
+        CropAug(480, 480, center_perterb_max=40, border_value=(0, 0, 0),
                  mask_border_val=1),
 
         FlipAug(num_parts=18, prob=0.3),
@@ -172,7 +172,7 @@ def build_sample(components):
     meta.img = None
     meta.aug_joints = None
     meta.aug_center = None
-    image = preprocess_image(image.astype(np.float32))
+    image = preprocess_image(image)
 
     return [image, mask_heatmap, heatmap]
 
