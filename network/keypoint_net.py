@@ -17,10 +17,10 @@ class KeypointNet():
         # input_heat_mask = KL.Input(shape=(120,120,19), name="mask_heat_input")
         # backbone = Backbone(input_image, bck_arch, bck_weights).model
         if bck_arch == 'resnet50':
-            backbone = keras_resnet.models.FPN2D50(input_image)
+            backbone = keras_resnet.models.FPN2D50(input_image, freeze_bn=False)
 
         if bck_arch == 'resnet101':
-            backbone = keras_resnet.models.FPN2D101(input_image)
+            backbone = keras_resnet.models.FPN2D101(input_image, freeze_bn=False)
 
 
 
