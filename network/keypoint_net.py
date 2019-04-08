@@ -9,7 +9,7 @@ from keras.utils import get_file
 class KeypointNet():
 
     def __init__(self, nb_keypoints, bck_arch = 'resnet50', prediction = False, bck_weights=None):
-        self.nb_keypoints = nb_keypoints# K + 1(mask)
+        self.nb_keypoints = nb_keypoints +1# K + 1(mask)
         if prediction:
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
         else:
@@ -73,12 +73,15 @@ class KeypointNet():
         # intermidiate supervision for loss
 
         self.k2 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k2') (P2)
-        self.k3 = KL.UpSampling2D((2, 2), name='sup_loss_k3up')(P3)
-        self.k3 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k3') (self.k3)
-        self.k4 = KL.UpSampling2D((4, 4), name='sup_loss_k4up')(P4)
-        self.k4 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(self.k4)
-        self.k5 = KL.UpSampling2D((8, 8), name='sup_loss_k5up')(P5)
-        self.k5 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(self.k5)
+
+        self.k3 = KL.Conv2D(self.nb_keypoints, (1,1), strides=1, padding="valid", name='sup_loss_k3') (P3)
+        self.k3 = KL.UpSampling2D((2, 2), name='sup_loss_k3up')(self.k3)
+
+        self.k4 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k4')(P4)
+        self.k4 = KL.UpSampling2D((4, 4), name='sup_loss_k4up')(self.k4)
+
+        self.k5 = KL.Conv2D(self.nb_keypoints, (1, 1), strides=1, padding="valid", name='sup_loss_k5')(P5)
+        self.k5 = KL.UpSampling2D((8, 8), name='sup_loss_k5up')(self.k5)
 
 
         self.D2 = KL.Conv2D(128, (3, 3), name="d2_1", padding="same") (P2)
@@ -138,10 +141,10 @@ class KeypointNet():
 
         losses = {}
         losses["Dfinal_2"] = _eucl_loss
-        losses["sup_loss_k2"] = _eucl_loss
-        losses["sup_loss_k3"] = _eucl_loss
-        losses["sup_loss_k4"] = _eucl_loss
-        losses["sup_loss_k5"] = _eucl_loss
+        losses["sup_loss_k2up"] = _eucl_loss
+        losses["sup_loss_k3up"] = _eucl_loss
+        losses["sup_loss_k4up"] = _eucl_loss
+        losses["sup_loss_k5up"] = _eucl_loss
 
         return losses
 
