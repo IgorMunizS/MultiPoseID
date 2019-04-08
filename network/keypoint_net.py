@@ -141,7 +141,7 @@ class KeypointNet():
 
         losses = {}
         losses["Dfinal_2"] = _eucl_loss
-        losses["sup_loss_k2up"] = _eucl_loss
+        losses["sup_loss_k2"] = _eucl_loss
         losses["sup_loss_k3up"] = _eucl_loss
         losses["sup_loss_k4up"] = _eucl_loss
         losses["sup_loss_k5up"] = _eucl_loss
