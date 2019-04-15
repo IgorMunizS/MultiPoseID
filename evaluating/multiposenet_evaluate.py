@@ -18,6 +18,10 @@ from network.prn_network import *
 from network.posecnet import PoseCNet
 import argparse
 import copy
+from keras_retinanet import models
+from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
+from keras_retinanet.utils.visualization import draw_box, draw_caption
+from keras_retinanet.utils.colors import label_color
 
 
 class CocoEval():
@@ -33,6 +37,7 @@ class CocoEval():
         self.posecnet.load_subnet_weights(k_weights="../Models/model.65-492.22.hdf5",
                                      d_weights="../Models/resnet101_coco_70_1.24.h5")
         # p_weights="../Models/prn_epoch20_final.h5"
+        self.detection = models.load_model('../Models/resnet50_coco_best_v2.1.0.h5', backbone_name='resnet50')
 
         self.prn_model = PRN(56, 36, 1024)
         self.prn_model.load_weights("../Models/epoch_3.h5")
@@ -151,8 +156,11 @@ class CocoEval():
             scores = scores[0]
             labels = labels[0]
 
-            # if m == 1:
-
+            if m == 1:
+                boxes, scores, labels = self.detection.predict_on_batch(im_data)
+                boxes = boxes[0]
+                scores = scores[0]
+                labels = labels[0]
 
             heatmap = heatmaps[0, :int(im_cropped.shape[0] / 4), :int(im_cropped.shape[1] / 4), :18]
             heatmap = cv2.resize(heatmap, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
@@ -163,7 +171,7 @@ class CocoEval():
             heatmap_avg = heatmap_avg + heatmap / len(multiplier)
 
             # bboxs
-            idxs = np.where(scores > 0.4)
+            idxs = np.where(scores > 0.5)
             bboxs = []
             for j in range(idxs[0].shape[0]):
                 bbox = boxes[idxs[0][j], :] / im_scale
