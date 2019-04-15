@@ -34,12 +34,12 @@ class CocoEval():
         # load model
         self.posecnet = PoseCNet(bck_arch=backbone)
         self.model = self.posecnet.model
-        self.posecnet.load_subnet_weights(k_weights="../Models/model.85-86.60.hdf5",
-                                     d_weights="../Models/detection_resnet50_0.421.h5")
+        self.posecnet.load_subnet_weights(k_weights="../Models/model.65-492.22.hdf5",
+                                     d_weights="../Models/resnet101_coco_70_1.24.h5")
         # p_weights="../Models/prn_epoch20_final.h5"
 
-        self.prn_model = PRN_Seperate(56, 36, 1024)
-        self.prn_model.load_weights("../Models/prn_epoch20_final.h5")
+        self.prn_model = PRN(56, 36, 1024)
+        self.prn_model.load_weights("../Models/epoch_3.h5")
         self.idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
 
 
@@ -454,7 +454,7 @@ def main(args=None):
         args = sys.argv[1:]
     args = parse_args(args)
 
-    cocoeval = CocoEval("resnet50")
+    cocoeval = CocoEval(args.backbone)
     cocoeval.coco_eval(args.coco_dir, args.dataset)
 
 

@@ -16,7 +16,7 @@ import keras_resnet.models
 class PoseCNet():
 
     def __init__(self, bck_arch="resnet50", nb_keypoints = 18):
-        self.nb_keypoints = nb_keypoints  # K + 1(mask)
+        self.nb_keypoints = nb_keypoints + 1  # K + 1(mask)
         input_image = KL.Input(shape=(None, None, 3), name='inputs')
         height = 56
         width = 36
