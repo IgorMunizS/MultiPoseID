@@ -101,6 +101,7 @@ class CocoEval():
         # run COCO evaluation
         coco_eval = COCOeval(coco, coco_pred, 'keypoints')
         coco_eval.params.imgIds = img_ids
+        coco_eval.params.catIds = [1]
         coco_eval.evaluate()
         coco_eval.accumulate()
         coco_eval.summarize()
