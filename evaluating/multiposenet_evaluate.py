@@ -18,11 +18,7 @@ from network.prn_network import *
 from network.posecnet import PoseCNet
 import argparse
 import copy
-from keras_retinanet.models import load_model
-from network.keypoint_net import  KeypointNet
-from network.backbone import Backbone
-from network.retinanet import *
-from keras.models import Model
+
 
 class CocoEval():
 
