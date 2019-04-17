@@ -4,9 +4,14 @@ import json
 import numpy as np
 from tqdm import tqdm
 from random import shuffle
-
+import argparse
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from pycocotools.cocoeval import COCOeval
 from utils.prn_gaussian  import gaussian, crop, gaussian_multi_input_mp
+from network.prn_network import *
+from pycocotools.coco import  COCO
+
 
 def Evaluation(model,optin,coco):
     print ('------------Evaulation Started------------')
@@ -275,3 +280,32 @@ def Evaluation(model,optin,coco):
     coco_eval.summarize()
 
     os.remove(ann_filename)
+
+def parse_args(args):
+    """ Parse the arguments.
+    """
+    parser = argparse.ArgumentParser(description='Evaluation script for a MultiPose Network.')
+
+
+    parser.add_argument('--weights', help='Path to prn weights')
+    parser.add_argument('--coeff',type=int, default=2, help='Coefficient of bbox size')
+    parser.add_argument('--threshold', type=int, default=0.21, help='BBOX threshold')
+    parser.add_argument('--window_size', type=int, default=15, help='Windows size for cropping')
+    parser.add_argument('--node_count', type=int, default=1024, help='Hidden Layer Node Count')
+
+    return parser.parse_args(args)
+
+
+def main(args=None):
+    # parse arguments
+    if args is None:
+        args = sys.argv[1:]
+    args = parse_args(args)
+
+    model = PRN(args.coeff*28,args.coeff*18, args.node_count)
+    model.load_weights(args.weights)
+    coco_val = COCO(os.path.join('../training/data/annotations/person_keypoints_val2017.json'))
+    Evaluation(model,args,coco_val)
+
+if __name__ == '__main__':
+    main()
