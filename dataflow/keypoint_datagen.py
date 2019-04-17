@@ -174,7 +174,7 @@ def build_sample(components):
     meta.aug_center = None
     image = preprocess_image(image)
 
-    return [image.astype(np.float64), mask_heatmap, heatmap]
+    return [image.astype(np.float32), mask_heatmap, heatmap]
 
 
 def get_dataflow(coco_data_paths):
