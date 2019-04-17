@@ -79,9 +79,41 @@ class CocoEval():
             heatmaps = self.handle_heat(orig_heat, flipped_heat)
 
             # segment_map = heatmaps[:, :, 17]
-            param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
-            joint_list = get_joint_list(oriImg, param, heatmaps[:,:,:18], 1)
-            joint_list = joint_list.tolist()
+            # param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
+            # joint_list = get_joint_list(oriImg, param, heatmaps[:,:,:18], 1)
+            # joint_list = joint_list.tolist()
+            from scipy.ndimage.filters import gaussian_filter
+            peak_counter = 0
+            all_peaks = []
+            for part in range(18):
+                map_ori = heatmaps[:, :, part]
+                map = gaussian_filter(map_ori, sigma=3)
+
+                map_left = np.zeros(map.shape)
+                map_left[1:, :] = map[:-1, :]
+                map_right = np.zeros(map.shape)
+                map_right[:-1, :] = map[1:, :]
+                map_up = np.zeros(map.shape)
+                map_up[:, 1:] = map[:, :-1]
+                map_down = np.zeros(map.shape)
+                map_down[:, :-1] = map[:, 1:]
+
+                peaks_binary = np.logical_and.reduce(
+                    (map >= map_left, map >= map_right, map >= map_up, map >= map_down, map > param['thre1']))
+                peaks = list(zip(np.nonzero(peaks_binary)[1], np.nonzero(peaks_binary)[0]))  # note reverse
+                peaks_with_score = [x + (map_ori[x[1], x[0]],) for x in peaks]
+                id = range(peak_counter, peak_counter + len(peaks))
+                peaks_with_score_and_id = [peaks_with_score[i] + (id[i],) for i in range(len(id))]
+
+                all_peaks.append(peaks_with_score_and_id)
+                peak_counter += len(peaks)
+
+            joint_list = []
+            for i, arr_peaks in enumerate(all_peaks):
+                for tuple_peak in arr_peaks:
+                    temp_list = list(tuple_peak)
+                    temp_list.append(float(i))
+                    joint_list.append(temp_list)
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
 
