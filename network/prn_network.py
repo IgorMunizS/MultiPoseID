@@ -5,15 +5,13 @@ from keras.layers import Dense, Input, Flatten, Reshape, Dropout, Activation
 
 def PRN(height, width, node_count):
     input = Input(shape=(height, width, 18))
-    y = Flatten()(input)
-    x = Dense(node_count, activation='relu')(y)
-    x = Dropout(0.5)(x)
-    x = Dense(node_count, activation='relu')(x)
-    x = Dropout(0.5)(x)
-    x = Dense(width * height * 18, activation='relu')(x)
-    x = keras.layers.Add()([x, y])
-    x = keras.layers.Activation('softmax')(x)
-    x = Reshape((height, width, 18))(x)
+    y = Flatten(name='prn_flatten')(input)
+    x = Dense(node_count, activation='relu', name="prn_dense_1")(y)
+    x = Dropout(0.5, name='do_1')(x)
+    x = Dense(width * height * 18, activation='relu', name='prn_dense_2')(x)
+    x = keras.layers.Add(name="prn_dense1_add_dense2")([x, y])
+    x = keras.layers.Activation('softmax', name='prn_activation')(x)
+    x = Reshape((height, width, 18), name='prn_reshape')(x)
     model = Model(inputs=input, outputs=x)
     # print(model.summary())
     return model

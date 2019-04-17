@@ -2,9 +2,6 @@ import keras.layers as KL
 from keras.models import Model
 from network.backbone import Backbone
 from utils.prn_forward_preprocess import get_prn_input, get_prn_output_shape
-import sys
-import os
-from scipy import ndimage
 import numpy as np
 import cv2
 
@@ -15,12 +12,13 @@ import keras_resnet.models
 
 class PoseCNet():
 
-    def __init__(self, bck_arch="resnet50", nb_keypoints = 18):
+    def __init__(self, bck_arch="resnet50", nb_keypoints = 18, prn=False):
         self.nb_keypoints = nb_keypoints + 1  # K + 1(mask)
         input_image = KL.Input(shape=(None, None, 3), name='inputs')
         height = 56
         width = 36
         node_count = 1024
+        self.prn = prn
 
         #Backbone (resnet50/101/x50/x101)
         if bck_arch == 'resnet50':
@@ -143,45 +141,39 @@ class PoseCNet():
         retina_bbox = retinanet_bbox(retina_net)
         self.detection_output = retina_bbox.output
 
-        # lambda_input = [self.keypoint_output]
-        # lambda_input.extend(self.detection_output)
-        #
-        # lambda_layer = keras.layers.Lambda(get_prn_input, get_prn_output_shape)
-        # self.person_heatmap = lambda_layer(lambda_input)
-        #
-        # #PRN NETWORK
-        # input = keras.layers.Lambda(lambda x: x[:,:,:,:18], name="prn_lambda_input")(self.person_heatmap)
-        # y = Flatten(name="prn_flatten", batch_input_shape=(None,56,36,18))(input)
-        # x = Dense(node_count, activation='relu', name="prn_dense_1")(y)
-        # x = Dropout(0.5)(x)
-        # x = Dense(width * height * 18, activation='relu', name="prn_dense_2")(x)
-        # x = keras.layers.Add(name="prn_dense1_add_dense2")([x, y])
-        # out = []
-        # start = 0
-        # end = width * height
-        #
-        # for i in range(18):
-        #     o = keras.layers.Lambda(lambda x: x[:, start:end], name="prn_lambda_" + str(i))(x)
-        #     o = Activation('softmax', name="prn_activation_" + str(i))(o)
-        #     out.append(o)
-        #     start = end
-        #     end = start + width * height
-        #
-        # x = keras.layers.Concatenate(name="prn_concat")(out)
-        # self.prn_output = Reshape((height, width, 18), name="prn_reshape")(x)
-        # self.prn_output = keras.layers.Lambda(lambda x: K.tf.expand_dims(x, axis=0))(self.prn_output)
-
-
         output = [self.keypoint_output]
         output.extend(self.detection_output)
-       # output.append(self.prn_output)
+
+        if self.prn:
+            lambda_input = [self.keypoint_output]
+            lambda_input.extend(self.detection_output)
+
+            lambda_layer = keras.layers.Lambda(get_prn_input, get_prn_output_shape)
+            self.person_heatmap = lambda_layer(lambda_input)
+            #
+            # #PRN NETWORK
+            input = keras.layers.Lambda(lambda x: x[:,:,:,:18], name="prn_lambda_input")(self.person_heatmap)
+
+            y = Flatten(name='prn_flatten', batch_input_shape=(None,56,36,18))(input)
+            x = Dense(node_count, activation='relu', name="prn_dense_1")(y)
+            x = Dropout(0.5, name='do_1')(x)
+            x = Dense(width * height * 18, activation='relu', name='prn_dense_2')(x)
+            x = keras.layers.Add(name="prn_dense1_add_dense2")([x, y])
+            x = keras.layers.Activation('softmax', name='prn_activation')(x)
+            self.prn_output = Reshape((height, width, 18), name="prn_reshape")(x)
+            self.prn_output = keras.layers.Lambda(lambda x: K.tf.expand_dims(x, axis=0))(self.prn_output)
+
+            output.append(self.prn_output)
+
         self.model = Model(inputs=input_graph, outputs=output)
         print(self.model.summary())
 
-    def load_subnet_weights(self, k_weights, d_weights):
+    def load_subnet_weights(self, k_weights, d_weights, p_weights):
         self.model.load_weights(k_weights, by_name=True)
         self.model.load_weights(d_weights, by_name=True)
-        #self.model.load_weights(p_weights, by_name=True)
+
+        if self.prn:
+            self.model.load_weights(p_weights, by_name=True)
 
 
     def predict(self,image):
