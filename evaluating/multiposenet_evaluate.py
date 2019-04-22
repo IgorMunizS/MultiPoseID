@@ -19,6 +19,7 @@ from network.posecnet import PoseCNet
 import argparse
 import copy
 from keras_retinanet import models
+from utils.preprocessing_image import preprocess_image
 from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
 from keras_retinanet.utils.visualization import draw_box, draw_caption
 from keras_retinanet.utils.colors import label_color
@@ -79,41 +80,9 @@ class CocoEval():
             heatmaps = self.handle_heat(orig_heat, flipped_heat)
 
             # segment_map = heatmaps[:, :, 17]
-            # param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
-            # joint_list = get_joint_list(oriImg, param, heatmaps[:,:,:18], 1)
-            # joint_list = joint_list.tolist()
-            from scipy.ndimage.filters import gaussian_filter
-            peak_counter = 0
-            all_peaks = []
-            for part in range(18):
-                map_ori = heatmaps[:, :, part]
-                map = gaussian_filter(map_ori, sigma=3)
-
-                map_left = np.zeros(map.shape)
-                map_left[1:, :] = map[:-1, :]
-                map_right = np.zeros(map.shape)
-                map_right[:-1, :] = map[1:, :]
-                map_up = np.zeros(map.shape)
-                map_up[:, 1:] = map[:, :-1]
-                map_down = np.zeros(map.shape)
-                map_down[:, :-1] = map[:, 1:]
-
-                peaks_binary = np.logical_and.reduce(
-                    (map >= map_left, map >= map_right, map >= map_up, map >= map_down, map > param['thre1']))
-                peaks = list(zip(np.nonzero(peaks_binary)[1], np.nonzero(peaks_binary)[0]))  # note reverse
-                peaks_with_score = [x + (map_ori[x[1], x[0]],) for x in peaks]
-                id = range(peak_counter, peak_counter + len(peaks))
-                peaks_with_score_and_id = [peaks_with_score[i] + (id[i],) for i in range(len(id))]
-
-                all_peaks.append(peaks_with_score_and_id)
-                peak_counter += len(peaks)
-
-            joint_list = []
-            for i, arr_peaks in enumerate(all_peaks):
-                for tuple_peak in arr_peaks:
-                    temp_list = list(tuple_peak)
-                    temp_list.append(float(i))
-                    joint_list.append(temp_list)
+            param = {'thre1': 0.1, 'thre2': 0.05, 'thre3': 0.5}
+            joint_list = get_joint_list(oriImg, param, heatmaps[:,:,:18], 1)
+            joint_list = joint_list.tolist()
 
             prn_result = self.prn_network(joint_list, orig_bbox_all[1], img_name, img_id)
 
@@ -179,6 +148,7 @@ class CocoEval():
             im_cropped, im_scale, real_shape = self.crop_with_factor(
                 img, inp_size, pad_val=128)
 
+            im_cropped = preprocess_image(im_cropped, mode='caffe')
 
             im_data = np.expand_dims(im_cropped, 0)
 
@@ -187,12 +157,6 @@ class CocoEval():
             boxes = boxes[0]
             scores = scores[0]
             labels = labels[0]
-
-            if m == 1:
-                boxes, scores, labels = self.detection.predict_on_batch(im_data)
-                boxes = boxes[0]
-                scores = scores[0]
-                labels = labels[0]
 
             heatmap = heatmaps[0, :int(im_cropped.shape[0] / 4), :int(im_cropped.shape[1] / 4), :18]
             heatmap = cv2.resize(heatmap, None, fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
@@ -203,7 +167,7 @@ class CocoEval():
             heatmap_avg = heatmap_avg + heatmap / len(multiplier)
 
             # bboxs
-            idxs = np.where(scores > 0.5)
+            idxs = np.where(scores > 0.3)
             bboxs = []
             for j in range(idxs[0].shape[0]):
                 bbox = boxes[idxs[0][j], :] / im_scale
