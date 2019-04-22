@@ -407,7 +407,6 @@ def main(args=None):
             args=args
         )
 
-    # print model summary
     print(model.summary())
 
     # this lets the generator compute backbone layer shapes using the actual backbone model
