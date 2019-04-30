@@ -128,7 +128,7 @@ class KeypointNet():
             md5_hash=checksum
         )
     def apply_mask(self, x, mask):
-        w_name = "weight_masked"
+        w_name = "Dfinal_masked"
 
         self.D = KL.Multiply(name=w_name)([x, mask])  # vec_heat
 
@@ -144,7 +144,7 @@ class KeypointNet():
             return K.sum(K.square(x - y)) / batch_size / 2
 
         losses = {}
-        losses["Dfinal_2"] = _eucl_loss
+        losses["Dfinal_masked"] = _eucl_loss
         losses["sup_loss_k2"] = _eucl_loss
         losses["sup_loss_k3up"] = _eucl_loss
         losses["sup_loss_k4up"] = _eucl_loss
