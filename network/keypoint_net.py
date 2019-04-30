@@ -9,12 +9,12 @@ from keras.utils import get_file
 class KeypointNet():
 
     def __init__(self, nb_keypoints, bck_arch = 'resnet50', prediction = False, bck_weights=None):
-        self.nb_keypoints = nb_keypoints +1# K + 1(mask)
+        self.nb_keypoints = nb_keypoints# K + 1(mask)
         if prediction:
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
         else:
             input_image = KL.Input(shape=(480, 480, 3), name='inputs')
-        input_heat_mask = KL.Input(shape=(120,120,19), name="mask_heat_input")
+        input_heat_mask = KL.Input(shape=(120,120,18), name="mask_heat_input")
         # backbone = Backbone(input_image, bck_arch, bck_weights).model
         if bck_arch == 'resnet50':
             backbone = keras_resnet.models.FPN2D50(input_image, freeze_bn=False)
