@@ -187,9 +187,9 @@ def get_dataflow(coco_data_paths):
     df = CocoDataFlow((480, 480), coco_data_paths)
     df.prepare()
     df = MapData(df, read_img)
-    df = MapData(df, gen_mask)
+    # df = MapData(df, gen_mask)
     df = MapData(df, augment)
-    df = MapData(df, apply_mask)
+    # df = MapData(df, apply_mask)
     df = MapData(df, build_sample)
     df = PrefetchDataZMQ(df, nr_proc=16) #df = PrefetchData(df, 2, 1)
 
@@ -206,7 +206,7 @@ def batch_dataflow(df, batch_size):
     """
     df = BatchData(df, batch_size, use_list=False)
     df = MapData(df, lambda x: (
-        [x[0]],
+        [x[0], x[1]],
         [x[2], x[2], x[2], x[2], x[2]])
                  )
     df.reset_state()

@@ -14,7 +14,7 @@ class KeypointNet():
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
         else:
             input_image = KL.Input(shape=(480, 480, 3), name='inputs')
-        # input_heat_mask = KL.Input(shape=(120,120,19), name="mask_heat_input")
+        input_heat_mask = KL.Input(shape=(120,120,19), name="mask_heat_input")
         # backbone = Backbone(input_image, bck_arch, bck_weights).model
         if bck_arch == 'resnet50':
             backbone = keras_resnet.models.FPN2D50(input_image, freeze_bn=False)
@@ -27,14 +27,14 @@ class KeypointNet():
         input_graph = backbone.input
         P2,P3,P4,P5, _ = backbone.output
         self.keypoint_net(P2,P3,P4,P5)
-        # self.apply_mask(self.D, input_heat_mask)
+        self.apply_mask(self.D, input_heat_mask)
 
         output_loss = [self.D, self.k2, self.k3, self.k4, self.k5]
 
         if prediction:
             self.model = Model(inputs=[input_graph], outputs=[self.D])
         else:
-            self.model = Model(inputs=[input_graph], outputs=output_loss)
+            self.model = Model(inputs=[input_graph, input_heat_mask], outputs=output_loss)
 
         if bck_weights is not None:
             if bck_weights == 'imagenet':
@@ -127,6 +127,10 @@ class KeypointNet():
             cache_subdir='models',
             md5_hash=checksum
         )
+    def apply_mask(self, x, mask):
+        w_name = "weight_masked"
+
+        self.D = KL.Multiply(name=w_name)([x, mask])  # vec_heat
 
     def keypoint_loss_function(self, batch_size):
         """
