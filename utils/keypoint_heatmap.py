@@ -25,7 +25,7 @@ def create_heatmap(num_maps, height, width, all_joints, sigma, stride):
                 _put_heatmap_on_plane(heatmap, plane_idx, joint, sigma, height, width, stride)
 
     # background
-    # heatmap[:, :, -1] = np.clip(1.0 - np.amax(heatmap, axis=2), 0.0, 1.0)
+    heatmap[:, :, -1] = np.clip(np.amax(heatmap, axis=2), 0.0, 1.0)
 
     return heatmap
 
