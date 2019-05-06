@@ -1,27 +1,27 @@
 import os
 import sys
-import cv2
-import numpy as np
-import json
 # Allow relative imports when being executed as script.
 if __name__ == "__main__" and __package__ is None:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+import os
+import sys
+import cv2
+import numpy as np
+# Allow relative imports when being executed as script.
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../keras-retinanet/'))
+
 from utils.keypoint_joint_utils import get_joint_list
 from tqdm import tqdm
 from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
 import math
 from utils.prn_gaussian import gaussian, crop
 from network.prn_network import *
 from network.posecnet import PoseCNet
 import argparse
-import copy
-from keras_retinanet import models
 from utils.preprocessing_image import preprocess_image
-from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
-from keras_retinanet.utils.visualization import draw_box, draw_caption
-from keras_retinanet.utils.colors import label_color
 import time
 
 

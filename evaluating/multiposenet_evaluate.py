@@ -18,11 +18,8 @@ from network.prn_network import *
 from network.posecnet import PoseCNet
 import argparse
 import copy
-from keras_retinanet import models
 from utils.preprocessing_image import preprocess_image
-from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
-from keras_retinanet.utils.visualization import draw_box, draw_caption
-from keras_retinanet.utils.colors import label_color
+
 
 
 class CocoEval():
