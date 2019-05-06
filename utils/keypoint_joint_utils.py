@@ -174,7 +174,7 @@ def draw(canvas, joints, bbox, color, thickness):
     y1 = int(bbox[1])
     x2 = int(bbox[0] + bbox[2])
     y2 = int(bbox[1] + bbox[3])
-    cv2.rectangle(canvas, (x1, y1), (x2, y2), color=(0, 0, 255), thickness=2)
+    cv2.rectangle(canvas, (x1, y1), (x2, y2), color=(0, 0, 255), thickness=thickness)
 
     for i in range(18):
         if int(joints[i][2]) == 0:
