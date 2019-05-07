@@ -12,21 +12,22 @@ class KeypointNet():
         self.nb_keypoints = nb_keypoints# K + 1(mask)
         if prediction:
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
-            input_image = Lambda(lambda x: x / 256 - 0.5)(input_image)
+            img_normalized = Lambda(lambda x: x / 256 - 0.5)(input_image)
         else:
             input_image = KL.Input(shape=(480, 480, 3), name='inputs')
-            input_image = Lambda(lambda x: x / 256 - 0.5)(input_image)
+            img_normalized = Lambda(lambda x: x / 256 - 0.5)(input_image)
+
         input_heat_mask = KL.Input(shape=(120,120,18), name="mask_heat_input")
         # backbone = Backbone(input_image, bck_arch, bck_weights).model
         if bck_arch == 'resnet50':
-            backbone = keras_resnet.models.FPN2D50(input_image, freeze_bn=False)
+            backbone = keras_resnet.models.FPN2D50(img_normalized, freeze_bn=False)
 
         if bck_arch == 'resnet101':
-            backbone = keras_resnet.models.FPN2D101(input_image, freeze_bn=False)
+            backbone = keras_resnet.models.FPN2D101(img_normalized, freeze_bn=False)
 
 
 
-        input_graph = backbone.input
+        # input_graph = backbone.input
         P2,P3,P4,P5, _ = backbone.output
         self.keypoint_net(P2,P3,P4,P5)
         self.apply_mask(self.D, input_heat_mask)
@@ -34,9 +35,9 @@ class KeypointNet():
         output_loss = [self.D, self.k2, self.k3, self.k4, self.k5]
 
         if prediction:
-            self.model = Model(inputs=[input_graph], outputs=[self.D])
+            self.model = Model(inputs=[input_image], outputs=[self.D])
         else:
-            self.model = Model(inputs=[input_graph, input_heat_mask], outputs=output_loss)
+            self.model = Model(inputs=[input_image, input_heat_mask], outputs=output_loss)
 
         if bck_weights is not None:
             if bck_weights == 'imagenet':
