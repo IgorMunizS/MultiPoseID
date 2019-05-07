@@ -35,13 +35,13 @@ class CocoEval():
         # load model
         self.posecnet = PoseCNet(bck_arch=backbone)
         self.model = self.posecnet.model
-        #self.posecnet.load_subnet_weights(k_weights="../Models/model.81-473.89.hdf5",
-                                     #d_weights="../Models/resnet101_coco_24_1.30.h5")
-        # p_weights="../Models/prn_epoch20_final.h5"
+        self.posecnet.load_subnet_weights(k_weights="../Models/model.65-492.22.hdf5",
+                                     d_weights="../Models/resnet101_coco_70_1.24.h5",
+                                     p_weights="../Models/prn_epoch20_final.h5")
         #self.detection = models.load_model('../Models/resnet50_coco_best_v2.1.0.h5', backbone_name='resnet50')
 
         self.prn_model = PRN(56, 36, 1024)
-        # self.prn_model.load_weights("../Models/epoch_3.h5")
+        self.prn_model.load_weights("../Models/epoch_3.h5")
         self.idx_in_coco = [0, 17, 6, 8, 10, 5, 7, 9, 12, 14, 16, 11, 13, 15, 2, 1, 4, 3]
 
 
