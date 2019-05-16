@@ -9,7 +9,7 @@ from keras.layers import Lambda
 class KeypointNet():
 
     def __init__(self, nb_keypoints, bck_arch = 'resnet50', prediction = False, bck_weights=None):
-        self.nb_keypoints = nb_keypoints# K + 1(mask)
+        self.nb_keypoints = nb_keypoints + 1# K + 1(mask)
         if prediction:
             input_image = KL.Input(shape=(None, None, 3), name='inputs')
             # img_normalized = Lambda(lambda x: x / 256 - 0.5)(input_image)
