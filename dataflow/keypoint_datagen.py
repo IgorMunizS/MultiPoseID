@@ -23,13 +23,13 @@ AUGMENTORS_LIST = [
                  target_dist=0.6,
                  interp=cv2.INTER_CUBIC),
 
-        # RotateAug(rotate_max_deg=40,
-        #           interp=cv2.INTER_CUBIC,
-        #           border=cv2.BORDER_CONSTANT,
-        #           border_value=(128, 128, 128), mask_border_val=1),
+        RotateAug(rotate_max_deg=40,
+                  interp=cv2.INTER_CUBIC,
+                  border=cv2.BORDER_CONSTANT,
+                  border_value=(128, 128, 128), mask_border_val=1),
         #
-        CropAug(480, 480, center_perterb_max=40, border_value=(0, 0, 0),
-                 mask_border_val=0),
+        CropAug(480, 480, center_perterb_max=40, border_value=(128, 128, 128),
+                 mask_border_val=1),
 
         FlipAug(num_parts=18, prob=0.3),
     ]

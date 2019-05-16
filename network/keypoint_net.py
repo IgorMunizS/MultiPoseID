@@ -30,7 +30,7 @@ class KeypointNet():
         input_graph = backbone.input
         P2,P3,P4,P5, _ = backbone.output
         self.keypoint_net(P2,P3,P4,P5)
-        self.apply_mask(self.D, input_heat_mask)
+        # self.apply_mask(self.D, input_heat_mask)
 
         output_loss = [self.D, self.k2, self.k3, self.k4, self.k5]
 
@@ -147,7 +147,7 @@ class KeypointNet():
             return K.sum(K.square(x - y)) / batch_size / 2
 
         losses = {}
-        losses["Dfinal_masked"] = _eucl_loss
+        losses["Dfinal_2"] = _eucl_loss
         losses["sup_loss_k2"] = _eucl_loss
         losses["sup_loss_k3up"] = _eucl_loss
         losses["sup_loss_k4up"] = _eucl_loss
