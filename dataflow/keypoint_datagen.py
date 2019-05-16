@@ -65,7 +65,7 @@ def gen_mask(components):
     """
     meta = components[0]
     if meta.masks_segments:
-        mask_miss = np.ones((meta.height, meta.width), dtype=np.float32)
+        mask_miss = np.ones((meta.height, meta.width), dtype=np.uint8)
         for seg in meta.masks_segments:
             bin_mask = maskUtils.decode(seg)
             bin_mask = np.logical_not(bin_mask)
