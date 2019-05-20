@@ -23,7 +23,7 @@ import sys
 import warnings
 
 import keras
-import keras.preprocessing.image
+# import keras.preprocessing.image
 import tensorflow as tf
 
 # Allow relative imports when being executed as script.
@@ -432,6 +432,8 @@ def main(args=None):
     training_model.fit_generator(
         generator=train_generator,
         steps_per_epoch=steps_per_epoch,
+        validation_data= validation_generator,
+        validation_steps= 1000,
         epochs=args.epochs,
         verbose=1,
         callbacks=callbacks,
