@@ -193,7 +193,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
         callbacks.append(checkpoint)
 
     callbacks.append(keras.callbacks.ReduceLROnPlateau(
-        monitor  = 'loss',
+        monitor  = 'val_loss',
         factor   = 0.1,
         patience = 2,
         verbose  = 1,
@@ -433,7 +433,7 @@ def main(args=None):
         generator=train_generator,
         steps_per_epoch=steps_per_epoch,
         validation_data= validation_generator,
-        validation_steps= 1000,
+        validation_steps= 1000 // args.batch_size,
         epochs=args.epochs,
         verbose=1,
         callbacks=callbacks,
