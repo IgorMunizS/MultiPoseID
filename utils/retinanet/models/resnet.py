@@ -93,11 +93,11 @@ def resnet_retinanet(num_classes, backbone='resnet50', inputs=None, modifier=Non
 
     # create the resnet backbone
     if backbone == 'resnet50':
-        resnet = keras_resnet.models.ResNet50(inputs, include_top=False, freeze_bn=True)
+        resnet = keras_resnet.models.ResNet50(inputs, include_top=False, freeze_bn=False)
     elif backbone == 'resnet101':
-        resnet = keras_resnet.models.ResNet101(inputs, include_top=False, freeze_bn=True)
+        resnet = keras_resnet.models.ResNet101(inputs, include_top=False, freeze_bn=False)
     elif backbone == 'resnet152':
-        resnet = keras_resnet.models.ResNet152(inputs, include_top=False, freeze_bn=True)
+        resnet = keras_resnet.models.ResNet152(inputs, include_top=False, freeze_bn=False)
     else:
         raise ValueError('Backbone (\'{}\') is invalid.'.format(backbone))
 
