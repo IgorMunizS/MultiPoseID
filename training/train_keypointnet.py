@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('--backbone', default=None, help='backbone model name')
     parser.add_argument('--weights', default='imagenet')
     parser.add_argument('--checkpoint', default=None)
-    parser.add_argument('--batchsize', default=4, type=int)
+    parser.add_argument('--batchsize', default=1, type=int)
     parser.add_argument('--epochs', default=30, type=int)
     parser.add_argument('--steps', default=None, type=int)
     parser.add_argument('--multiprocessing', default=False, type=bool)

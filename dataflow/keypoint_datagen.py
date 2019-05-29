@@ -173,8 +173,8 @@ def build_sample(components):
     meta.img = None
     meta.aug_joints = None
     meta.aug_center = None
-    image = image / 255.
-    # image = preprocess_image(image)
+    # image = image / 255.
+    image = preprocess_image(image)
     return [image.astype(np.float32), mask_heatmap, heatmap]
 
 
