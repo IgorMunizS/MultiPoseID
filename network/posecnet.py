@@ -19,6 +19,7 @@ class PoseCNet():
         width = 36
         node_count = 1024
         self.prn = prn
+        self.classification =True
 
         #Backbone (resnet50/101/x50/x101)
         if bck_arch == 'resnet50':
@@ -165,8 +166,29 @@ class PoseCNet():
 
             output.append(self.prn_output)
 
+        if self.classification:
+            x = Dense(3072, activation='relu', name="prn_class_dense_1")(self.prn_output)
+            x = keras.layers.BatchNormalization()(x)
+            x = Dropout(0.5, name='do_class_1')(x)
+            x = Dense(128, activation='relu', name="prn_class_dense_2")(x)
+            x = keras.layers.BatchNormalization()(x)
+            x = Dropout(0.5, name='do_class_2')(x)
+
+            # x = Dense(36, activation='relu', name="prn_dense_3")(x)
+            # x = BatchNormalization()(x)
+            # x = Dropout(0.3, name='do_3')(x)
+            # x = keras.layers.Add(name="prn_dense1_add_dense2")([x, y])
+            self.class_output = Dense(4, activation='softmax', name="activ")(x)
+            output.append(self.class_output)
+
+
         self.model = Model(inputs=input_graph, outputs=output)
+
+        from contextlib import redirect_stdout
         print(self.model.summary())
+        with open('modelsummary.txt', 'w') as f:
+            with redirect_stdout(f):
+                self.model.summary()
 
     def load_subnet_weights(self, k_weights, d_weights, p_weights):
         self.model.load_weights(k_weights, by_name=True)
@@ -186,4 +208,4 @@ class PoseCNet():
 
         return prediction
 
-# PoseCNet(bck_arch='resnet50')
+PoseCNet(bck_arch='resnet50', prn=True)
